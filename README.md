@@ -27,7 +27,7 @@ git init
 git add .
 git commit -m "feat: inicializar mantenedor supabase"
 git branch -M main
-git remote add origin https://github.com/TU-USUARIO/MantenedorSupabase.git
+git remote add origin https://github.com/AaronSGomez/MantenedorFreeSupabase.git
 git push -u origin main
 ```
 *(Puedes hacer el repositorio **Público** o **Privado** según prefieras)*.
