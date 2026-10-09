@@ -33,7 +33,6 @@
   </script>
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-supabase-500 selection:text-slate-900">
@@ -48,16 +47,20 @@
         <div>
           <h1 class="font-bold text-lg text-white flex items-center gap-2">
             Mantenedor Supabase
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-supabase-500/20 text-supabase-500 border border-supabase-500/30">v1.0</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-supabase-500/20 text-supabase-500 border border-supabase-500/30">v1.1</span>
           </h1>
           <p class="text-xs text-slate-400">Protección automática contra inactivación de bases de datos</p>
         </div>
       </div>
 
       <div class="flex items-center space-x-3">
+        <button onclick="triggerGitHubWorkflow()" id="btn-trigger-gh" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 font-semibold text-xs rounded-lg border border-blue-500/30 transition-all flex items-center gap-1.5 active:scale-95" title="Disparar ejecución inmediata en GitHub Actions">
+          <i data-lucide="cloud-lightning" class="w-4 h-4"></i>
+          <span>Disparar en Nube</span>
+        </button>
         <button onclick="pingAllProjects()" id="btn-ping-all" class="px-4 py-2 bg-supabase-500 hover:bg-supabase-600 text-slate-950 font-semibold text-sm rounded-lg transition-all flex items-center gap-2 shadow-md shadow-supabase-500/20 active:scale-95">
           <i data-lucide="play" class="w-4 h-4 fill-current"></i>
-          <span>Ping a Todos</span>
+          <span>Ping Local</span>
         </button>
         <button onclick="openProjectModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm rounded-lg border border-slate-700 transition-all flex items-center gap-2 active:scale-95">
           <i data-lucide="plus" class="w-4 h-4"></i>
@@ -94,7 +97,7 @@
 
       <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-sm flex items-center justify-between">
         <div>
-          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Último Ping Masivo</p>
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Último Ping Local</p>
           <p class="text-sm font-semibold text-white mt-1" id="stat-last-ping">Nunca</p>
         </div>
         <div class="p-3 bg-purple-500/10 text-purple-400 rounded-lg border border-purple-500/20">
@@ -102,13 +105,17 @@
         </div>
       </div>
 
+      <!-- Cloud Status Widget -->
       <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-sm flex items-center justify-between">
         <div>
-          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Automatización Cron</p>
-          <p class="text-sm font-semibold text-emerald-400 mt-1" id="stat-cron">Diario (00:00 UTC)</p>
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Estado Nube (GitHub Actions)</p>
+          <p class="text-sm font-semibold text-emerald-400 mt-1 flex items-center gap-1.5" id="stat-github-status">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Cargando...
+          </p>
         </div>
         <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
-          <i data-lucide="calendar" class="w-5 h-5"></i>
+          <i data-lucide="github" class="w-5 h-5"></i>
         </div>
       </div>
     </div>
@@ -119,13 +126,17 @@
         <i data-lucide="layers" class="w-4 h-4"></i>
         Proyectos Supabase
       </button>
+      <button onclick="switchTab('github')" id="tab-btn-github" class="pb-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2 border-b-2 border-transparent">
+        <i data-lucide="cloud" class="w-4 h-4"></i>
+        Ejecuciones en Nube (GitHub)
+      </button>
       <button onclick="switchTab('logs')" id="tab-btn-logs" class="pb-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2 border-b-2 border-transparent">
         <i data-lucide="activity" class="w-4 h-4"></i>
-        Historial de Pings
+        Historial Local
       </button>
       <button onclick="switchTab('automation')" id="tab-btn-automation" class="pb-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2 border-b-2 border-transparent">
         <i data-lucide="bot" class="w-4 h-4"></i>
-        Guía de Automatización
+        Guía de Configuración
       </button>
     </div>
 
@@ -138,8 +149,8 @@
         <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 mb-3">
           <i data-lucide="database" class="w-6 h-6"></i>
         </div>
-        <h3 class="text-base font-semibold text-white">No tienes proyectos registrados</h3>
-        <p class="text-sm text-slate-400 mt-1">Agrega tu primer proyecto de Supabase para comenzar a enviar pings diarios.</p>
+        <h3 class="text-base font-semibold text-white">No tienes proyectos locales registrados</h3>
+        <p class="text-sm text-slate-400 mt-1">Agrega tu primer proyecto de Supabase o consulta las ejecuciones automáticas de la Nube.</p>
         <button onclick="openProjectModal()" class="mt-4 px-4 py-2 bg-supabase-500 hover:bg-supabase-600 text-slate-950 font-semibold text-sm rounded-lg transition-all inline-flex items-center gap-2">
           <i data-lucide="plus" class="w-4 h-4"></i>
           Agregar Proyecto
@@ -147,10 +158,53 @@
       </div>
     </div>
 
-    <!-- TAB 2: LOGS -->
+    <!-- TAB 2: GITHUB ACTIONS CLOUD RUNS -->
+    <div id="tab-github" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="github" class="text-blue-400"></i>
+            Estado de Ejecuciones Automáticas en GitHub Actions
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Sincronizado directamente con la API de tu repositorio en GitHub</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="fetchGitHubStatus()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            Actualizar
+          </button>
+          <button onclick="triggerGitHubWorkflow()" class="px-3.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-slate-950 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5">
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+            Ejecutar Ahora en Nube
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800/60 text-xs font-semibold uppercase text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="px-4 py-3">Flujo / Workflow</th>
+                <th class="px-4 py-3">Disparador</th>
+                <th class="px-4 py-3">Estado</th>
+                <th class="px-4 py-3">Resultado</th>
+                <th class="px-4 py-3">Fecha / Hora</th>
+                <th class="px-4 py-3 text-right">Detalles</th>
+              </tr>
+            </thead>
+            <tbody id="github-tbody" class="divide-y divide-slate-800/60">
+              <!-- GitHub Runs injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: LOGS LOCALES -->
     <div id="tab-logs" class="hidden space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="text-sm font-medium text-slate-400">Historial reciente de ejecuciones (Últimos 100)</h3>
+        <h3 class="text-sm font-medium text-slate-400">Historial reciente de ejecuciones locales</h3>
         <button onclick="clearLogs()" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5">
           <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           Limpiar Historial
@@ -177,75 +231,38 @@
       </div>
     </div>
 
-    <!-- TAB 3: AUTOMATION GUIDE -->
+    <!-- TAB 4: AUTOMATION GUIDE -->
     <div id="tab-automation" class="hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-6">
         <div>
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
             <i data-lucide="bot" class="text-supabase-500"></i>
-            Opciones para la Ejecución 100% Automática
+            Funcionamiento Dual: Local y Nube
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Elige el método que mejor se adapte a tus necesidades para asegurar pings diarios sin intervención manual.</p>
+          <p class="text-sm text-slate-400 mt-1">Tu mantenedor puede funcionar mediante GitHub Actions en la nube o localmente mediante este panel.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Option 1: GitHub Actions -->
           <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3 relative overflow-hidden">
             <div class="flex items-center justify-between">
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Recomendado - 100% Gratis</span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Ejecución en Nube</span>
               <i data-lucide="github" class="w-6 h-6 text-slate-400"></i>
             </div>
-            <h3 class="text-base font-semibold text-white">1. GitHub Actions (Automático en Nube)</h3>
+            <h3 class="text-base font-semibold text-white">GitHub Actions (Secret `SUPABASE_PROJECTS`)</h3>
             <p class="text-xs text-slate-400 leading-relaxed">
-              El repositorio ya incluye el archivo <code class="bg-slate-800 text-slate-200 px-1 py-0.5 rounded">.github/workflows/supabase-keeper.yml</code>. Al subir este proyecto a un repositorio privado o público en GitHub, se ejecutará automáticamente todos los días a medianoche UTC.
-            </p>
-            <div class="text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono">
-              git add .<br>
-              git commit -m "feat: setup mantenedor supabase"<br>
-              git push origin main
-            </div>
-          </div>
-
-          <!-- Option 2: External Cron-Job Services -->
-          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Si Despliegas la Web</span>
-              <i data-lucide="globe" class="w-6 h-6 text-slate-400"></i>
-            </div>
-            <h3 class="text-base font-semibold text-white">2. Webhook Cron (Cron-Job.org / UptimeRobot)</h3>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Si despliegas esta aplicación web en <b>Vercel, Render o Railway</b>, puedes configurar un servicio gratuito como <a href="https://cron-job.org" target="_blank" class="text-supabase-500 underline">cron-job.org</a> para hacer una petición diaria a tu endpoint:
-            </p>
-            <div class="text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono">
-              POST https://tu-app.onrender.com/api/ping-all
-            </div>
-          </div>
-
-          <!-- Option 3: Local Node Cron -->
-          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">Servidor / PC Siempre encendido</span>
-              <i data-lucide="server" class="w-6 h-6 text-slate-400"></i>
-            </div>
-            <h3 class="text-base font-semibold text-white">3. Cron Integrado en Node.js</h3>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              El servidor cuenta con un temporizador `node-cron` que ejecuta los pings diariamente si mantienes `npm start` ejecutándose en tu servidor o VPS.
+              Corre automáticamente en la nube de GitHub sin necesidad de tener tu PC encendida. Lee tus credenciales encriptadas desde <b>Settings ➔ Secrets ➔ Actions</b>.
             </p>
           </div>
 
-          <!-- Option 4: Standalone CLI Script -->
           <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3">
             <div class="flex items-center justify-between">
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Comando Directo</span>
-              <i data-lucide="terminal" class="w-6 h-6 text-slate-400"></i>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Ejecución Local</span>
+              <i data-lucide="hard-drive" class="w-6 h-6 text-slate-400"></i>
             </div>
-            <h3 class="text-base font-semibold text-white">4. Ejecución CLI de Un Solo Paso</h3>
+            <h3 class="text-base font-semibold text-white">Dashboard Local (`data/projects.json`)</h3>
             <p class="text-xs text-slate-400 leading-relaxed">
-              Puedes ejecutar el ping manualmente o dentro del programador de tareas de tu sistema operativo con:
+              Al ejecutar `npm start`, puedes agregar proyectos localmente y probar la conexión con pings manuales. Los datos se guardan solo en tu computadora.
             </p>
-            <div class="text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono">
-              npm run ping
-            </div>
           </div>
         </div>
       </div>
@@ -282,7 +299,6 @@
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">API Key (Anon / Service Role Key)</label>
           <input type="password" id="form-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-supabase-500 transition-colors">
-          <p class="text-[11px] text-slate-400 mt-1">Obtén la clave en Supabase Project Settings -> API -> anon public key.</p>
         </div>
 
         <div>
@@ -322,28 +338,98 @@
   <script>
     let stateProjects = [];
     let stateLogs = [];
+    let stateGitHub = null;
 
-    // Initialize Lucide icons
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       fetchProjects();
       fetchLogs();
       fetchStatus();
+      fetchGitHubStatus();
     });
 
-    // Fetch Status
     async function fetchStatus() {
       try {
         const res = await fetch('/api/status');
         const data = await res.json();
         document.getElementById('stat-total').innerText = data.totalProjects;
         document.getElementById('stat-active').innerText = data.activeProjects;
+      } catch (err) {}
+    }
+
+    async function fetchGitHubStatus() {
+      try {
+        const res = await fetch('/api/github/runs');
+        stateGitHub = await res.json();
+        renderGitHubStatus();
       } catch (err) {
-        console.error('Error al obtener status:', err);
+        document.getElementById('stat-github-status').innerHTML = `<span class="text-slate-400 font-normal text-xs">Sin conexión GitHub</span>`;
       }
     }
 
-    // Fetch Projects
+    function renderGitHubStatus() {
+      const widget = document.getElementById('stat-github-status');
+      const tbody = document.getElementById('github-tbody');
+
+      if (!stateGitHub || !stateGitHub.available || !stateGitHub.latestRun) {
+        widget.innerHTML = `<span class="text-slate-400 font-normal text-xs">Desconectado</span>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No se pudieron consultar ejecuciones de GitHub Actions.</td></tr>`;
+        return;
+      }
+
+      const run = stateGitHub.latestRun;
+      const isSuccess = run.conclusion === 'success';
+
+      widget.innerHTML = isSuccess 
+        ? `<span class="text-emerald-400 flex items-center gap-1 text-xs font-semibold"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Éxito (${new Date(run.created_at).toLocaleTimeString()})</span>`
+        : `<span class="text-amber-400 flex items-center gap-1 text-xs font-semibold"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> ${run.status}</span>`;
+
+      tbody.innerHTML = stateGitHub.runs.map(r => {
+        const succ = r.conclusion === 'success';
+        const badge = succ
+          ? `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ÉXITO ✓</span>`
+          : `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">${(r.conclusion || r.status || 'En curso').toUpperCase()}</span>`;
+
+        return `
+          <tr class="hover:bg-slate-800/30 transition-colors">
+            <td class="px-4 py-3 font-semibold text-white">${escapeHtml(r.name)}</td>
+            <td class="px-4 py-3 text-xs text-slate-400 font-mono">${escapeHtml(r.event)}</td>
+            <td class="px-4 py-3 text-xs text-slate-300">${escapeHtml(r.status)}</td>
+            <td class="px-4 py-3">${badge}</td>
+            <td class="px-4 py-3 font-mono text-xs text-slate-400">${new Date(r.created_at).toLocaleString()}</td>
+            <td class="px-4 py-3 text-right">
+              <a href="${r.html_url}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded text-xs font-medium inline-flex items-center gap-1 border border-slate-700">
+                Ver en GitHub <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function triggerGitHubWorkflow() {
+      const btn = document.getElementById('btn-trigger-gh');
+      btn.disabled = true;
+      showToast('Disparando workflow en GitHub Actions...', 'info');
+
+      try {
+        const res = await fetch('/api/github/trigger', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('¡Workflow iniciado en GitHub Actions!', 'success');
+          setTimeout(fetchGitHubStatus, 3000);
+        } else {
+          showToast(data.error || 'Error al disparar workflow', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión con la API local', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
     async function fetchProjects() {
       try {
         const res = await fetch('/api/projects');
@@ -355,18 +441,16 @@
       }
     }
 
-    // Fetch Logs
     async function fetchLogs() {
       try {
         const res = await fetch('/api/logs');
         stateLogs = await res.json();
         renderLogs();
       } catch (err) {
-        showToast('Error al cargar historial de logs', 'error');
+        showToast('Error al cargar historial', 'error');
       }
     }
 
-    // Update Top Summary Stats
     function updateStats() {
       document.getElementById('stat-total').innerText = stateProjects.length;
       document.getElementById('stat-active').innerText = stateProjects.filter(p => p.enabled !== false).length;
@@ -374,13 +458,12 @@
       const pings = stateProjects.map(p => p.lastPing?.timestamp).filter(Boolean);
       if (pings.length > 0) {
         const latest = new Date(Math.max(...pings.map(p => new Date(p))));
-        document.getElementById('stat-last-ping').innerText = latest.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + latest.toLocaleDateString() + ')';
+        document.getElementById('stat-last-ping').innerText = latest.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       } else {
         document.getElementById('stat-last-ping').innerText = 'Nunca';
       }
     }
 
-    // Render Projects List
     function renderProjects() {
       const container = document.getElementById('projects-container');
       const emptyState = document.getElementById('projects-empty');
@@ -411,7 +494,6 @@
                 <div>
                   <h3 class="font-bold text-white text-base flex items-center gap-2">
                     ${escapeHtml(p.name)}
-                    ${p.createdFromEnv ? '<span class="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded">ENV</span>' : ''}
                   </h3>
                   <a href="${escapeHtml(p.url)}" target="_blank" class="text-xs text-slate-400 hover:text-supabase-500 transition-colors flex items-center gap-1 mt-0.5">
                     ${escapeHtml(p.url)}
@@ -442,14 +524,12 @@
                   <i data-lucide="zap" class="w-3.5 h-3.5"></i>
                   <span>Ping</span>
                 </button>
-                ${!p.createdFromEnv ? `
-                  <button onclick="editProject('${p.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors">
-                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                  </button>
-                  <button onclick="deleteProject('${p.id}')" class="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-colors">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                  </button>
-                ` : ''}
+                <button onclick="editProject('${p.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteProject('${p.id}')" class="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-colors">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -459,7 +539,6 @@
       lucide.createIcons();
     }
 
-    // Render Logs Table
     function renderLogs() {
       const tbody = document.getElementById('logs-tbody');
       if (stateLogs.length === 0) {
@@ -486,7 +565,6 @@
       }).join('');
     }
 
-    // Ping Single Project
     async function pingSingleProject(id) {
       try {
         showToast('Ejecutando ping...', 'info');
@@ -504,12 +582,10 @@
       }
     }
 
-    // Ping All Projects
     async function pingAllProjects() {
       const btn = document.getElementById('btn-ping-all');
       btn.disabled = true;
-      btn.classList.add('opacity-70');
-      showToast('Enviando ping masivo a todos los proyectos...', 'info');
+      showToast('Enviando ping masivo local...', 'info');
 
       try {
         const res = await fetch('/api/ping-all', { method: 'POST' });
@@ -525,11 +601,9 @@
         showToast('Error al conectar con el servidor', 'error');
       } finally {
         btn.disabled = false;
-        btn.classList.remove('opacity-70');
       }
     }
 
-    // Modal Control
     function openProjectModal() {
       document.getElementById('project-form').reset();
       document.getElementById('form-project-id').value = '';
@@ -635,9 +709,8 @@
       }
     }
 
-    // Tabs
     function switchTab(tabName) {
-      ['projects', 'logs', 'automation'].forEach(t => {
+      ['projects', 'github', 'logs', 'automation'].forEach(t => {
         const content = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`tab-btn-${t}`);
         if (t === tabName) {
@@ -650,7 +723,6 @@
       });
     }
 
-    // Toast UI
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');

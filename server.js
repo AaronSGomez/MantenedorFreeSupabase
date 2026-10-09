@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { exec } = require('child_process');
 const cron = require('node-cron');
 const { getProjects, saveProjects, getLogs, pingProject, pingAllProjects } = require('./lib/keeper');
 
@@ -9,6 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const CRON_SECRET = process.env.CRON_SECRET || '';
 const CRON_SCHEDULE = process.env.CRON_SCHEDULE || '0 0 * * *'; // Default: Midnight every day
+const REPO_OWNER_NAME = process.env.GITHUB_REPO || 'AaronSGomez/MantenedorFreeSupabase';
 
 app.use(cors());
 app.use(express.json());
@@ -41,7 +43,6 @@ app.get('/api/status', (req, res) => {
 // List Projects
 app.get('/api/projects', (req, res) => {
   const projects = getProjects();
-  // Return projects with masked keys for security unless requested
   const safeProjects = projects.map(p => ({
     ...p,
     keyMasked: maskKey(p.key)
@@ -68,7 +69,7 @@ app.post('/api/projects', (req, res) => {
     name: name.trim(),
     url: formattedUrl,
     key: key ? key.trim() : '',
-    target: target || 'rest', // 'rest', 'table', 'auth'
+    target: target || 'rest',
     customTable: customTable ? customTable.trim() : '',
     enabled: enabled !== false,
     createdAt: new Date().toISOString(),
@@ -101,7 +102,7 @@ app.put('/api/projects/:id', (req, res) => {
 
   const existing = projects[index];
   if (existing.createdFromEnv) {
-    return res.status(400).json({ error: 'No se puede modificar un proyecto definido por variable de entorno (SUPABASE_PROJECTS).' });
+    return res.status(400).json({ error: 'No se puede modificar un proyecto definido por variable de entorno.' });
   }
 
   if (name) existing.name = name.trim();
@@ -170,9 +171,8 @@ app.post('/api/projects/:id/ping', async (req, res) => {
   }
 });
 
-// Trigger Ping for ALL Active Projects (Supports Cron Secret)
+// Trigger Ping for ALL Active Projects
 app.all(['/api/ping-all', '/api/cron'], async (req, res) => {
-  // Check authorization if CRON_SECRET is configured
   if (CRON_SECRET) {
     const headerSecret = req.headers['x-cron-secret'] || req.headers['authorization'];
     const querySecret = req.query.secret;
@@ -198,6 +198,61 @@ app.all(['/api/ping-all', '/api/cron'], async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Error durante el ping masivo', details: err.message });
   }
+});
+
+// ----------------------------------------------------
+// GITHUB ACTIONS INTEGRATION ENDPOINTS
+// ----------------------------------------------------
+
+// Get GitHub Actions Latest Runs Status
+app.get('/api/github/runs', (req, res) => {
+  const cmd = `gh api repos/${REPO_OWNER_NAME}/actions/runs --jq ".workflow_runs[0:5] | map({id, name, status, conclusion, created_at, updated_at, html_url, event})"`;
+
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      // Return graceful empty state if gh CLI is not configured or offline
+      return res.json({
+        available: false,
+        message: 'No se pudo conectar con GitHub CLI o la API de GitHub.',
+        runs: []
+      });
+    }
+
+    try {
+      const runs = JSON.parse(stdout || '[]');
+      res.json({
+        available: true,
+        repo: REPO_OWNER_NAME,
+        latestRun: runs[0] || null,
+        runs
+      });
+    } catch (parseErr) {
+      res.json({
+        available: false,
+        message: 'Error al analizar respuesta de GitHub API',
+        runs: []
+      });
+    }
+  });
+});
+
+// Trigger GitHub Actions Workflow remotely from Web Dashboard
+app.post('/api/github/trigger', (req, res) => {
+  const cmd = `gh workflow run supabase-keeper.yml --repo ${REPO_OWNER_NAME}`;
+
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      return res.status(500).json({
+        error: 'No se pudo disparar el workflow en GitHub Actions',
+        details: stderr || error.message
+      });
+    }
+
+    res.json({
+      message: '¡Workflow de GitHub Actions disparado exitosamente en la nube!',
+      output: stdout.trim()
+    });
+  });
 });
 
 // Logs Endpoint
@@ -227,7 +282,7 @@ app.get('*', (req, res) => {
 // ----------------------------------------------------
 if (cron.validate(CRON_SCHEDULE)) {
   cron.schedule(CRON_SCHEDULE, async () => {
-    console.log(`[Cron Interno] Ejecutando manteniento programado (${CRON_SCHEDULE})...`);
+    console.log(`[Cron Interno] Ejecutando mantenimiento programado (${CRON_SCHEDULE})...`);
     await pingAllProjects();
   });
   console.log(`[Cron Interno] Tarea diaria activada con expresión: "${CRON_SCHEDULE}"`);
