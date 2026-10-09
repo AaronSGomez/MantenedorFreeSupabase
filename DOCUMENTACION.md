@@ -1,16 +1,17 @@
 # 📘 Documentación Técnica Explicativa - Mantenedor Supabase
 
-Este documento describe en detalle el funcionamiento técnico, la seguridad de datos y los mecanismos internos de **Mantenedor Supabase**.
+Este documento describe en detalle el funcionamiento técnico, la seguridad de datos, la integración con la API de GitHub y los mecanismos internos de **Mantenedor Supabase**.
 
 ---
 
 ## 📋 Índice
 1. [¿Por qué Supabase pausa los proyectos gratis?](#1-por-qué-supabase-pausa-los-proyectos-gratis)
 2. [Explicación Paso a Paso de Cómo Funciona el Sistema](#2-explicación-paso-a-paso-de-cómo-funciona-el-sistema)
-3. [Seguridad y Repositorios Públicos en GitHub](#3-seguridad-y-repositorios-públicos-en-github)
-4. [Estrategias de Ping Disponible y Cabeceras HTTP](#4-estrategias-de-ping-disponible-y-cabeceras-http)
-5. [Interpretación de Respuestas y Logs](#5-interpretación-de-respuestas-y-logs)
-6. [Resumen de Archivos y Responsabilidades](#6-resumen-de-archivos-y-responsabilidades)
+3. [Integración en Tiempo Real con la API de GitHub Actions](#3-integración-en-tiempo-real-con-la-api-de-github-actions)
+4. [Seguridad y Repositorios Públicos en GitHub](#4-seguridad-y-repositorios-públicos-en-github)
+5. [Estrategias de Ping Disponible y Cabeceras HTTP](#5-estrategias-de-ping-disponible-y-cabeceras-http)
+6. [Interpretación de Respuestas y Logs](#6-interpretación-de-respuestas-y-logs)
+7. [Resumen de Archivos y Responsabilidades](#7-resumen-de-archivos-y-responsabilidades)
 
 ---
 
@@ -27,7 +28,7 @@ Supabase ofrece un plan gratuito muy generoso, pero para optimizar recursos en s
 
 ## 2. Explicación Paso a Paso de Cómo Funciona el Sistema
 
-El sistema opera mediante el siguiente flujo automatizado:
+El sistema opera mediante dos modos de ejecución sincronizados:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -63,14 +64,32 @@ El sistema opera mediante el siguiente flujo automatizado:
                                      │
                                      ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       5. REGISTRO Y FINALIZACIÓN                            │
-│   Calcula la latencia (ms), guarda el log y cierra la ejecución             │
+│               5. REGISTRO Y MONITOREO DESDE EL DASHBOARD                    │
+│   Guarda el log local y reporta el estado a la API de GitHub Actions       │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Seguridad y Repositorios Públicos en GitHub
+## 3. Integración en Tiempo Real con la API de GitHub Actions
+
+El Dashboard Web y la herramienta CLI están conectados directamente con la **API de GitHub Actions** del repositorio ([AaronSGomez/MantenedorFreeSupabase](https://github.com/AaronSGomez/MantenedorFreeSupabase)):
+
+### Endpoints Agregados al Servidor (`server.js`):
+
+1. **`GET /api/github/runs`**:
+   - Consulta el historial reciente de flujos ejecutados en GitHub Actions mediante GitHub API / GitHub CLI (`gh`).
+   - Retorna la fecha, estado (`completed` / `in_progress`), conclusión (`success` / `failure`) y la URL directa de los registros.
+
+2. **`POST /api/github/trigger`**:
+   - Permite disparar el flujo `.github/workflows/supabase-keeper.yml` de forma remota directamente desde el botón **"☁️ Disparar en Nube"** del Dashboard Web sin entrar a la web de GitHub.
+
+### Monitoreo desde CLI (`scripts/ping.js`):
+Al ejecutar `npm run ping` en consola, el script no solo ejecuta pings locales, sino que consulta la API de GitHub y muestra una tarjeta con el estado real de la nube.
+
+---
+
+## 4. Seguridad y Repositorios Públicos en GitHub
 
 ### 🛡️ ¿Es seguro hacer público este repositorio?
 
@@ -92,7 +111,7 @@ De esta forma, **puedes hacer tu repositorio público sin ningún riesgo**.
 
 ---
 
-## 4. Estrategias de Ping Disponible y Cabeceras HTTP
+## 5. Estrategias de Ping Disponible y Cabeceras HTTP
 
 Puedes configurar cada proyecto con una de las siguientes 3 estrategias según tu preferencia:
 
@@ -114,7 +133,7 @@ Accept: application/json
 
 ---
 
-## 5. Interpretación de Respuestas y Logs
+## 6. Interpretación de Respuestas y Logs
 
 Cuando el mantenedor realiza el ping, evalúa la respuesta HTTP de Supabase:
 
@@ -125,10 +144,11 @@ Cuando el mantenedor realiza el ping, evalúa la respuesta HTTP de Supabase:
 
 ---
 
-## 6. Resumen de Archivos y Responsabilidades
+## 7. Resumen de Archivos y Responsabilidades
 
 - 📄 **[README.md](file:///c:/PROYECTS/MantenedorSupabase/README.md)**: Guía rápida y paso a paso para usuarios de cómo configurar GitHub Actions y el Dashboard Web.
-- 📄 **[server.js](file:///c:/PROYECTS/MantenedorSupabase/server.js)**: Servidor web Express que provee las rutas de la API (`/api/projects`, `/api/ping-all`, `/api/logs`) y el panel web.
+- 📄 **[server.js](file:///c:/PROYECTS/MantenedorSupabase/server.js)**: Servidor web Express que provee las rutas de la API (`/api/projects`, `/api/ping-all`, `/api/github/runs`, `/api/github/trigger`) y el panel web.
 - 📄 **[lib/keeper.js](file:///c:/PROYECTS/MantenedorSupabase/lib/keeper.js)**: Módulo principal que gestiona el envío de pings HTTP, medición de latencias y persistencia de logs.
-- 📄 **[scripts/ping.js](file:///c:/PROYECTS/MantenedorSupabase/scripts/ping.js)**: Punto de entrada para la ejecución por línea de comandos (CLI) y GitHub Actions.
+- 📄 **[scripts/ping.js](file:///c:/PROYECTS/MantenedorSupabase/scripts/ping.js)**: Punto de entrada para la ejecución por línea de comandos (CLI) que incluye diagnóstico local y estado de la nube en GitHub.
+- 📄 **[public/index.html](file:///c:/PROYECTS/MantenedorSupabase/public/index.html)**: Interfaz web SPA con tarjetas de estado en la nube, tabla de ejecuciones de GitHub Actions y disparador remoto.
 - 📄 **[.github/workflows/supabase-keeper.yml](file:///c:/PROYECTS/MantenedorSupabase/.github/workflows/supabase-keeper.yml)**: Archivo YAML que indica a GitHub la programación del Cron diario.

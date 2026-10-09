@@ -14,6 +14,20 @@ Un proyecto simple, completo y automático diseñado para realizar peticiones pe
 
 ---
 
+## 🚀 Características Principales
+
+- **Dashboard Web Moderno**: Interfaz gráfica intuitiva para administrar proyectos de Supabase, ver latencias, respuestas HTTP y logs.
+- **Integración en Tiempo Real con GitHub Actions API**: Visualiza directamente desde la Web local el estado de las ejecuciones realizadas en la nube por GitHub.
+- **Disparador Remoto ("Disparar en Nube")**: Botón para mandar a ejecutar el workflow en GitHub Actions de forma remota sin entrar a la página de GitHub.
+- **Automatización 100% Gratuita (GitHub Actions)**: Flujo de trabajo `.github/workflows/supabase-keeper.yml` para ejecutarse automáticamente **todos los días en la nube sin necesidad de mantener encendida tu PC**.
+- **Diagnóstico por Consola (CLI)**: Ejecuta `npm run ping` para obtener un informe instantáneo del estado de tus proyectos locales y de la nube.
+- **Múltiples Estrategias de Ping**:
+  - `REST API Root` (`https://<proyecto>.supabase.co/rest/v1/`): Ligero y seguro (Recomendado).
+  - `Auth Health` (`https://<proyecto>.supabase.co/auth/v1/health`): Comprobación del servicio de autenticación.
+  - `Consulta a Tabla`: Petición a una tabla específica (ej. `users`, `profiles`, `productos`).
+
+---
+
 ## 🚀 Paso a Paso: Cómo Configurar la Automatización en 3 Pasos
 
 Sigue estos 3 sencillos pasos para dejar tu mantenedor funcionando automáticamente para siempre:
@@ -38,7 +52,7 @@ git push -u origin main
 
 Para que GitHub sepa qué proyectos de Supabase debe mantener vivos sin publicar tus claves en el código:
 
-1. Ve a tu repositorio en GitHub.
+1. Ve a tu repositorio en GitHub ([https://github.com/AaronSGomez/MantenedorFreeSupabase](https://github.com/AaronSGomez/MantenedorFreeSupabase)).
 2. Haz clic en la pestaña **Settings** (Configuración) en la parte superior.
 3. En el menú lateral izquierdo, ve a **Secrets and variables** ➔ **Actions**.
 4. Haz clic en el botón verde **New repository secret**.
@@ -73,8 +87,8 @@ No tienes que esperar a la medianoche para comprobar que funciona:
 
 1. En tu repositorio de GitHub, ve a la pestaña **Actions**.
 2. En el panel izquierdo, selecciona el flujo **Supabase Keep-Alive Daily Ping**.
-3. Haz clic en el botón **Run workflow** ➔ **Run workflow**.
-4. En unos segundos verás un ícono verde de éxito `✓`. Haz clic en él para ver el detalle de los pings realizados a tus bases de datos.
+3. Haz clic en el botón **Run workflow** ➔ **Run workflow** (o usa el botón **"☁️ Disparar en Nube"** del Dashboard Web local).
+4. En unos segundos verás un ícono verde de éxito `✓`.
 
 ¡Y listo! A partir de este momento, GitHub ejecutará este flujo **automáticamente todos los días a las 00:00 UTC**, manteniendo tus proyectos de Supabase activos de forma indefinida.
 
@@ -93,25 +107,16 @@ npm start
 Ve a: **[http://localhost:3000](http://localhost:3000)**
 
 Desde el dashboard podrás:
-- Agregar o editar proyectos con un formulario interactivo.
-- Probar el botón **"Ping a Todos"** o hacer ping individual a cada proyecto.
-- Ver la latencia en milisegundos, el código HTTP devuelto y el historial de ejecuciones.
-
----
-
-## ⚙️ ¿Cómo Funciona por Dentro?
-
-1. **Cada día a las 00:00 UTC**, GitHub Actions inicia una máquina virtual temporal.
-2. El script de Node.js lee la variable de entorno `SUPABASE_PROJECTS` que configuraste en GitHub Secrets.
-3. Realiza una petición `GET` autenticada a la API REST de cada uno de tus proyectos de Supabase.
-4. Al recibir la petición HTTP, Supabase activa el motor de la base de datos PostgreSQL y el servicio PostgREST, **reiniciando el contador de inactividad de 7 días**.
-5. La máquina virtual de GitHub finaliza y registra el éxito en la pestaña **Actions**.
+- Ver el estado en vivo de las ejecuciones en la Nube (GitHub Actions).
+- Disparar ejecuciones en la nube con 1 solo clic.
+- Agregar o editar proyectos locales.
+- Realizar pings de prueba inmediatos.
 
 ---
 
 ## 📘 Documentación Explicativa Técnica
 
-Para consultar una explicación más detallada sobre las estrategias de ping, códigos de respuesta HTTP, cabeceras enviadas y la arquitectura técnica:
+Para consultar una explicación más detallada sobre la integración con la API de GitHub, estrategias de ping, códigos HTTP y arquitectura técnica:
 👉 Consulta el archivo **[DOCUMENTACION.md](file:///c:/PROYECTS/MantenedorSupabase/DOCUMENTACION.md)**.
 
 ---
@@ -129,14 +134,14 @@ MantenedorSupabase/
 ├── lib/
 │   └── keeper.js                 # Lógica principal de peticiones y registro de logs
 ├── public/
-│   └── index.html                # Dashboard Web SPA (TailwindCSS + Lucide Icons)
+│   └── index.html                # Dashboard Web SPA (TailwindCSS + Lucide Icons + GitHub Sync)
 ├── scripts/
-│   └── ping.js                   # Script ejecutable por CLI y GitHub Actions
+│   └── ping.js                   # Script ejecutable CLI con diagnóstico local y de Nube
 ├── .env.example                  # Plantilla de variables de entorno
 ├── DOCUMENTACION.md              # Documentación técnica detallada
 ├── README.md                     # Guía de inicio rápido y configuración paso a paso
 ├── package.json                  # Configuración de dependencias y scripts npm
-└── server.js                     # Servidor Express & API REST
+└── server.js                     # Servidor Express, API REST & Integración GitHub Actions
 ```
 
 ---
