@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Keep-Alive Dashboard</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Font Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            supabase: {
+              50: '#f3fbf7',
+              100: '#e1f6ec',
+              500: '#3ecf8e',
+              600: '#24b47e',
+              700: '#1b8a61',
+              900: '#122b20',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-supabase-500 selection:text-slate-900">
+
+  <!-- Header / Navbar -->
+  <header class="border-b border-slate-800 bg-slate-900/60 sticky top-0 z-30 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-supabase-500/10 border border-supabase-500/30 flex items-center justify-center text-supabase-500 shadow-lg shadow-supabase-500/10">
+          <i data-lucide="zap" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-white flex items-center gap-2">
+            Mantenedor Supabase
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-supabase-500/20 text-supabase-500 border border-supabase-500/30">v1.0</span>
+          </h1>
+          <p class="text-xs text-slate-400">Protección automática contra inactivación de bases de datos</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button onclick="pingAllProjects()" id="btn-ping-all" class="px-4 py-2 bg-supabase-500 hover:bg-supabase-600 text-slate-950 font-semibold text-sm rounded-lg transition-all flex items-center gap-2 shadow-md shadow-supabase-500/20 active:scale-95">
+          <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+          <span>Ping a Todos</span>
+        </button>
+        <button onclick="openProjectModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm rounded-lg border border-slate-700 transition-all flex items-center gap-2 active:scale-95">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Nuevo Proyecto</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+
+    <!-- Metrics Bar -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Proyectos Registrados</p>
+          <p class="text-2xl font-bold text-white mt-1" id="stat-total">0</p>
+        </div>
+        <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20">
+          <i data-lucide="database" class="w-5 h-5"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Proyectos Activos</p>
+          <p class="text-2xl font-bold text-supabase-500 mt-1" id="stat-active">0</p>
+        </div>
+        <div class="p-3 bg-supabase-500/10 text-supabase-500 rounded-lg border border-supabase-500/20">
+          <i data-lucide="check-circle" class="w-5 h-5"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Último Ping Masivo</p>
+          <p class="text-sm font-semibold text-white mt-1" id="stat-last-ping">Nunca</p>
+        </div>
+        <div class="p-3 bg-purple-500/10 text-purple-400 rounded-lg border border-purple-500/20">
+          <i data-lucide="clock" class="w-5 h-5"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Automatización Cron</p>
+          <p class="text-sm font-semibold text-emerald-400 mt-1" id="stat-cron">Diario (00:00 UTC)</p>
+        </div>
+        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
+          <i data-lucide="calendar" class="w-5 h-5"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="border-b border-slate-800 flex space-x-8">
+      <button onclick="switchTab('projects')" id="tab-btn-projects" class="pb-3 text-sm font-semibold text-supabase-500 border-b-2 border-supabase-500 flex items-center gap-2">
+        <i data-lucide="layers" class="w-4 h-4"></i>
+        Proyectos Supabase
+      </button>
+      <button onclick="switchTab('logs')" id="tab-btn-logs" class="pb-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2 border-b-2 border-transparent">
+        <i data-lucide="activity" class="w-4 h-4"></i>
+        Historial de Pings
+      </button>
+      <button onclick="switchTab('automation')" id="tab-btn-automation" class="pb-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2 border-b-2 border-transparent">
+        <i data-lucide="bot" class="w-4 h-4"></i>
+        Guía de Automatización
+      </button>
+    </div>
+
+    <!-- TAB 1: PROJECTS -->
+    <div id="tab-projects" class="space-y-4">
+      <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Project cards injected via JS -->
+      </div>
+      <div id="projects-empty" class="hidden text-center py-16 bg-slate-900/40 border border-dashed border-slate-800 rounded-2xl">
+        <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 mb-3">
+          <i data-lucide="database" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-base font-semibold text-white">No tienes proyectos registrados</h3>
+        <p class="text-sm text-slate-400 mt-1">Agrega tu primer proyecto de Supabase para comenzar a enviar pings diarios.</p>
+        <button onclick="openProjectModal()" class="mt-4 px-4 py-2 bg-supabase-500 hover:bg-supabase-600 text-slate-950 font-semibold text-sm rounded-lg transition-all inline-flex items-center gap-2">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          Agregar Proyecto
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 2: LOGS -->
+    <div id="tab-logs" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-medium text-slate-400">Historial reciente de ejecuciones (Últimos 100)</h3>
+        <button onclick="clearLogs()" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          Limpiar Historial
+        </button>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800/60 text-xs font-semibold uppercase text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="px-4 py-3">Fecha / Hora</th>
+                <th class="px-4 py-3">Proyecto</th>
+                <th class="px-4 py-3">Estado</th>
+                <th class="px-4 py-3">HTTP Status</th>
+                <th class="px-4 py-3">Latencia</th>
+                <th class="px-4 py-3">Detalle</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody" class="divide-y divide-slate-800/60">
+              <!-- Logs injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: AUTOMATION GUIDE -->
+    <div id="tab-automation" class="hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="bot" class="text-supabase-500"></i>
+            Opciones para la Ejecución 100% Automática
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Elige el método que mejor se adapte a tus necesidades para asegurar pings diarios sin intervención manual.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Option 1: GitHub Actions -->
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Recomendado - 100% Gratis</span>
+              <i data-lucide="github" class="w-6 h-6 text-slate-400"></i>
+            </div>
+            <h3 class="text-base font-semibold text-white">1. GitHub Actions (Automático en Nube)</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              El repositorio ya incluye el archivo <code class="bg-slate-800 text-slate-200 px-1 py-0.5 rounded">.github/workflows/supabase-keeper.yml</code>. Al subir este proyecto a un repositorio privado o público en GitHub, se ejecutará automáticamente todos los días a medianoche UTC.
+            </p>
+            <div class="text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono">
+              git add .<br>
+              git commit -m "feat: setup mantenedor supabase"<br>
+              git push origin main
+            </div>
+          </div>
+
+          <!-- Option 2: External Cron-Job Services -->
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Si Despliegas la Web</span>
+              <i data-lucide="globe" class="w-6 h-6 text-slate-400"></i>
+            </div>
+            <h3 class="text-base font-semibold text-white">2. Webhook Cron (Cron-Job.org / UptimeRobot)</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Si despliegas esta aplicación web en <b>Vercel, Render o Railway</b>, puedes configurar un servicio gratuito como <a href="https://cron-job.org" target="_blank" class="text-supabase-500 underline">cron-job.org</a> para hacer una petición diaria a tu endpoint:
+            </p>
+            <div class="text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono">
+              POST https://tu-app.onrender.com/api/ping-all
+            </div>
+          </div>
+
+          <!-- Option 3: Local Node Cron -->
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">Servidor / PC Siempre encendido</span>
+              <i data-lucide="server" class="w-6 h-6 text-slate-400"></i>
+            </div>
+            <h3 class="text-base font-semibold text-white">3. Cron Integrado en Node.js</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              El servidor cuenta con un temporizador `node-cron` que ejecuta los pings diariamente si mantienes `npm start` ejecutándose en tu servidor o VPS.
+            </p>
+          </div>
+
+          <!-- Option 4: Standalone CLI Script -->
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Comando Directo</span>
+              <i data-lucide="terminal" class="w-6 h-6 text-slate-400"></i>
+            </div>
+            <h3 class="text-base font-semibold text-white">4. Ejecución CLI de Un Solo Paso</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Puedes ejecutar el ping manualmente o dentro del programador de tareas de tu sistema operativo con:
+            </p>
+            <div class="text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono">
+              npm run ping
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: ADD / EDIT PROJECT -->
+  <div id="project-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2" id="modal-title">
+          <i data-lucide="database" class="text-supabase-500 w-5 h-5"></i>
+          <span>Agregar Proyecto Supabase</span>
+        </h3>
+        <button onclick="closeProjectModal()" class="text-slate-400 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="project-form" onsubmit="handleProjectSubmit(event)" class="space-y-4">
+        <input type="hidden" id="form-project-id" value="">
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Nombre del Proyecto *</label>
+          <input type="text" id="form-name" required placeholder="Ej: Mi App Principal / Backend Tienda" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-supabase-500 transition-colors">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">URL de Supabase *</label>
+          <input type="url" id="form-url" required placeholder="https://xyzxyz.supabase.co" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-supabase-500 transition-colors">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">API Key (Anon / Service Role Key)</label>
+          <input type="password" id="form-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-supabase-500 transition-colors">
+          <p class="text-[11px] text-slate-400 mt-1">Obtén la clave en Supabase Project Settings -> API -> anon public key.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Estrategia de Ping</label>
+          <select id="form-target" onchange="toggleCustomTableInput()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-supabase-500 transition-colors">
+            <option value="rest">REST API Root (https://.../rest/v1/) - Recomendado</option>
+            <option value="auth">Auth Health Check (https://.../auth/v1/health)</option>
+            <option value="table">Consulta a Tabla Específica</option>
+          </select>
+        </div>
+
+        <div id="custom-table-container" class="hidden">
+          <label class="block text-xs font-medium text-slate-300 mb-1">Nombre de la Tabla</label>
+          <input type="text" id="form-custom-table" placeholder="Ej: users / profiles / productos" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-supabase-500 transition-colors">
+        </div>
+
+        <div class="flex items-center space-x-2 pt-2">
+          <input type="checkbox" id="form-enabled" checked class="w-4 h-4 accent-supabase-500 rounded bg-slate-950 border-slate-800">
+          <label for="form-enabled" class="text-xs text-slate-300">Activar pings automáticos para este proyecto</label>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg transition-colors">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-supabase-500 hover:bg-supabase-600 text-slate-950 font-semibold text-sm rounded-lg transition-colors flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            Guardar Proyecto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- JavaScript -->
+  <script>
+    let stateProjects = [];
+    let stateLogs = [];
+
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      fetchProjects();
+      fetchLogs();
+      fetchStatus();
+    });
+
+    // Fetch Status
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        document.getElementById('stat-total').innerText = data.totalProjects;
+        document.getElementById('stat-active').innerText = data.activeProjects;
+      } catch (err) {
+        console.error('Error al obtener status:', err);
+      }
+    }
+
+    // Fetch Projects
+    async function fetchProjects() {
+      try {
+        const res = await fetch('/api/projects');
+        stateProjects = await res.json();
+        renderProjects();
+        updateStats();
+      } catch (err) {
+        showToast('Error al cargar proyectos', 'error');
+      }
+    }
+
+    // Fetch Logs
+    async function fetchLogs() {
+      try {
+        const res = await fetch('/api/logs');
+        stateLogs = await res.json();
+        renderLogs();
+      } catch (err) {
+        showToast('Error al cargar historial de logs', 'error');
+      }
+    }
+
+    // Update Top Summary Stats
+    function updateStats() {
+      document.getElementById('stat-total').innerText = stateProjects.length;
+      document.getElementById('stat-active').innerText = stateProjects.filter(p => p.enabled !== false).length;
+
+      const pings = stateProjects.map(p => p.lastPing?.timestamp).filter(Boolean);
+      if (pings.length > 0) {
+        const latest = new Date(Math.max(...pings.map(p => new Date(p))));
+        document.getElementById('stat-last-ping').innerText = latest.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + latest.toLocaleDateString() + ')';
+      } else {
+        document.getElementById('stat-last-ping').innerText = 'Nunca';
+      }
+    }
+
+    // Render Projects List
+    function renderProjects() {
+      const container = document.getElementById('projects-container');
+      const emptyState = document.getElementById('projects-empty');
+
+      if (stateProjects.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      container.innerHTML = stateProjects.map(p => {
+        const isSuccess = p.lastPing?.status === 'SUCCESS';
+        const isFailed = p.lastPing?.status === 'FAILED';
+
+        const statusBadge = isSuccess 
+          ? `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Despierto</span>`
+          : (isFailed 
+            ? `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span> Error Ping</span>`
+            : `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-400 border border-slate-700">Sin Pings</span>`);
+
+        const targetLabel = p.target === 'table' ? `Tabla: ${p.customTable || 'custom'}` : (p.target === 'auth' ? 'Auth Health' : 'REST Root');
+
+        return `
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    ${escapeHtml(p.name)}
+                    ${p.createdFromEnv ? '<span class="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded">ENV</span>' : ''}
+                  </h3>
+                  <a href="${escapeHtml(p.url)}" target="_blank" class="text-xs text-slate-400 hover:text-supabase-500 transition-colors flex items-center gap-1 mt-0.5">
+                    ${escapeHtml(p.url)}
+                    <i data-lucide="external-link" class="w-3 h-3"></i>
+                  </a>
+                </div>
+                ${statusBadge}
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mt-4 text-xs">
+                <div class="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+                  <span class="text-slate-500 block text-[10px] uppercase font-semibold">Estrategia</span>
+                  <span class="text-slate-200 font-medium">${targetLabel}</span>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+                  <span class="text-slate-500 block text-[10px] uppercase font-semibold">Última Latencia</span>
+                  <span class="text-slate-200 font-medium">${p.lastPing ? p.lastPing.latencyMs + ' ms (HTTP ' + p.lastPing.httpStatus + ')' : '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-800/80 pt-3 flex items-center justify-between text-xs">
+              <span class="text-slate-400 text-[11px]">
+                ${p.lastPing ? 'Último: ' + new Date(p.lastPing.timestamp).toLocaleTimeString() : 'Esperando primer ping'}
+              </span>
+              <div class="flex items-center space-x-2">
+                <button onclick="pingSingleProject('${p.id}')" class="px-3 py-1.5 bg-supabase-500/10 hover:bg-supabase-500/20 text-supabase-500 border border-supabase-500/30 font-semibold rounded-lg transition-all flex items-center gap-1 active:scale-95">
+                  <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                  <span>Ping</span>
+                </button>
+                ${!p.createdFromEnv ? `
+                  <button onclick="editProject('${p.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="deleteProject('${p.id}')" class="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-colors">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Render Logs Table
+    function renderLogs() {
+      const tbody = document.getElementById('logs-tbody');
+      if (stateLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No hay logs registrados aún.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = stateLogs.map(log => {
+        const isSuccess = log.status === 'SUCCESS';
+        const badge = isSuccess
+          ? `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ÉXITO</span>`
+          : `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">FALLO</span>`;
+
+        return `
+          <tr class="hover:bg-slate-800/30 transition-colors">
+            <td class="px-4 py-3 font-mono text-xs text-slate-400">${new Date(log.timestamp).toLocaleString()}</td>
+            <td class="px-4 py-3 font-semibold text-white">${escapeHtml(log.projectName)}</td>
+            <td class="px-4 py-3">${badge}</td>
+            <td class="px-4 py-3 font-mono text-xs ${isSuccess ? 'text-emerald-400' : 'text-red-400'}">${log.httpStatus || 'N/A'}</td>
+            <td class="px-4 py-3 font-mono text-xs text-slate-300">${log.latencyMs} ms</td>
+            <td class="px-4 py-3 text-xs text-slate-400 max-w-xs truncate" title="${escapeHtml(log.message)}">${escapeHtml(log.message)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Ping Single Project
+    async function pingSingleProject(id) {
+      try {
+        showToast('Ejecutando ping...', 'info');
+        const res = await fetch(`/api/projects/${id}/ping`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`Ping a "${data.result.projectName}": ${data.result.status} (${data.result.latencyMs}ms)`, data.result.status === 'SUCCESS' ? 'success' : 'error');
+          fetchProjects();
+          fetchLogs();
+        } else {
+          showToast(data.error || 'Error al ejecutar ping', 'error');
+        }
+      } catch (err) {
+        showToast('Error de red al ejecutar ping', 'error');
+      }
+    }
+
+    // Ping All Projects
+    async function pingAllProjects() {
+      const btn = document.getElementById('btn-ping-all');
+      btn.disabled = true;
+      btn.classList.add('opacity-70');
+      showToast('Enviando ping masivo a todos los proyectos...', 'info');
+
+      try {
+        const res = await fetch('/api/ping-all', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`Procesados ${data.summary.total} proyecto(s): ${data.summary.success} exitosos, ${data.summary.failed} fallidos.`, 'success');
+          fetchProjects();
+          fetchLogs();
+        } else {
+          showToast(data.error || 'Error durante el ping masivo', 'error');
+        }
+      } catch (err) {
+        showToast('Error al conectar con el servidor', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-70');
+      }
+    }
+
+    // Modal Control
+    function openProjectModal() {
+      document.getElementById('project-form').reset();
+      document.getElementById('form-project-id').value = '';
+      document.getElementById('modal-title').innerText = 'Agregar Proyecto Supabase';
+      document.getElementById('project-modal').classList.remove('hidden');
+      document.getElementById('project-modal').classList.add('flex');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('project-modal').classList.add('hidden');
+      document.getElementById('project-modal').classList.remove('flex');
+    }
+
+    function toggleCustomTableInput() {
+      const target = document.getElementById('form-target').value;
+      const container = document.getElementById('custom-table-container');
+      if (target === 'table') {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    function editProject(id) {
+      const p = stateProjects.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('form-project-id').value = p.id;
+      document.getElementById('form-name').value = p.name;
+      document.getElementById('form-url').value = p.url;
+      document.getElementById('form-key').value = p.key || '';
+      document.getElementById('form-target').value = p.target || 'rest';
+      document.getElementById('form-custom-table').value = p.customTable || '';
+      document.getElementById('form-enabled').checked = p.enabled !== false;
+
+      toggleCustomTableInput();
+
+      document.getElementById('modal-title').innerText = 'Editar Proyecto Supabase';
+      document.getElementById('project-modal').classList.remove('hidden');
+      document.getElementById('project-modal').classList.add('flex');
+    }
+
+    async function handleProjectSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('form-project-id').value;
+      const body = {
+        name: document.getElementById('form-name').value,
+        url: document.getElementById('form-url').value,
+        key: document.getElementById('form-key').value,
+        target: document.getElementById('form-target').value,
+        customTable: document.getElementById('form-custom-table').value,
+        enabled: document.getElementById('form-enabled').checked
+      };
+
+      const url = id ? `/api/projects/${id}` : '/api/projects';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showToast(id ? 'Proyecto actualizado' : 'Proyecto guardado correctamente', 'success');
+          closeProjectModal();
+          fetchProjects();
+        } else {
+          showToast(data.error || 'Error al guardar el proyecto', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión con el servidor', 'error');
+      }
+    }
+
+    async function deleteProject(id) {
+      if (!confirm('¿Estás seguro de que deseas eliminar este proyecto del mantenedor?')) return;
+      try {
+        const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Proyecto eliminado', 'success');
+          fetchProjects();
+        } else {
+          showToast('No se pudo eliminar el proyecto', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión', 'error');
+      }
+    }
+
+    async function clearLogs() {
+      if (!confirm('¿Limpiar todo el historial de logs de pings?')) return;
+      try {
+        const res = await fetch('/api/logs', { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Historial limpiado', 'success');
+          fetchLogs();
+        }
+      } catch (err) {
+        showToast('Error al limpiar logs', 'error');
+      }
+    }
+
+    // Tabs
+    function switchTab(tabName) {
+      ['projects', 'logs', 'automation'].forEach(t => {
+        const content = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabName) {
+          content.classList.remove('hidden');
+          btn.className = 'pb-3 text-sm font-semibold text-supabase-500 border-b-2 border-supabase-500 flex items-center gap-2';
+        } else {
+          content.classList.add('hidden');
+          btn.className = 'pb-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2 border-b-2 border-transparent';
+        }
+      });
+    }
+
+    // Toast UI
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        success: 'bg-emerald-950 border-emerald-800 text-emerald-200',
+        error: 'bg-red-950 border-red-800 text-red-200',
+        info: 'bg-slate-900 border-slate-700 text-white'
+      };
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border text-xs font-medium shadow-xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+      toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+      
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

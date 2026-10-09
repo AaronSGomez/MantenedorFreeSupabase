@@ -1,0 +1,27 @@
+{
+  "name": "mantenedor-supabase",
+  "version": "1.0.0",
+  "description": "Mantenedor automático de proyectos Supabase para evitar suspensión por inactividad",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "ping": "node scripts/ping.js"
+  },
+  "keywords": [
+    "supabase",
+    "keep-alive",
+    "ping",
+    "cron",
+    "github-actions"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3"
+  }
+}
