@@ -23,6 +23,24 @@ function maskKey(key) {
   return key.substring(0, 6) + '...' + key.substring(key.length - 4);
 }
 
+// Helper to mask Supabase URLs so private project refs are never exposed
+function maskUrl(url) {
+  if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname;
+    const parts = host.split('.');
+    if (parts.length >= 3 && parts[1] === 'supabase' && parts[2] === 'co') {
+      const sub = parts[0];
+      const prefix = sub.length > 4 ? sub.substring(0, 4) : sub.substring(0, 2);
+      return `https://${prefix}••••••••.supabase.co`;
+    }
+    return `https://${host.substring(0, 4)}••••••••`;
+  } catch (e) {
+    return 'https://••••••••.supabase.co';
+  }
+}
+
 // ----------------------------------------------------
 // API ROUTES
 // ----------------------------------------------------
@@ -51,12 +69,14 @@ app.get('/api/status', (req, res) => {
   }
 });
 
-// List Projects
+// List Projects (URLs y Keys enmascaradas para que los visitantes no vean las rutas internas)
 app.get('/api/projects', (req, res) => {
   try {
     const projects = getProjects();
     const safeProjects = projects.map(p => ({
       ...p,
+      url: maskUrl(p.url),
+      urlMasked: maskUrl(p.url),
       keyMasked: maskKey(p.key)
     }));
     res.json(safeProjects);
@@ -179,7 +199,10 @@ app.post('/api/projects/:id/ping', async (req, res) => {
     const result = await pingProject(project);
     res.json({
       message: `Ping ejecutado para "${project.name}"`,
-      result
+      result: {
+        ...result,
+        targetUrl: maskUrl(result.targetUrl)
+      }
     });
   } catch (err) {
     res.status(500).json({ error: 'Error al ejecutar ping', details: err.message });
@@ -200,15 +223,19 @@ app.all(['/api/ping-all', '/api/cron'], async (req, res) => {
 
   try {
     const results = await pingAllProjects();
+    const safeResults = results.map(r => ({
+      ...r,
+      targetUrl: maskUrl(r.targetUrl)
+    }));
     res.json({
       message: 'Ping masivo completado',
       timestamp: new Date().toISOString(),
       summary: {
-        total: results.length,
-        success: results.filter(r => r.status === 'SUCCESS').length,
-        failed: results.filter(r => r.status === 'FAILED').length
+        total: safeResults.length,
+        success: safeResults.filter(r => r.status === 'SUCCESS').length,
+        failed: safeResults.filter(r => r.status === 'FAILED').length
       },
-      results
+      results: safeResults
     });
   } catch (err) {
     res.status(500).json({ error: 'Error durante el ping masivo', details: err.message });
