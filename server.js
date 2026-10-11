@@ -9,7 +9,7 @@ const { getProjects, saveProjects, getLogs, pingProject, pingAllProjects } = req
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CRON_SECRET = process.env.CRON_SECRET || '';
-const CRON_SCHEDULE = process.env.CRON_SCHEDULE || '0 0 * * *'; // Default: Midnight every day
+const CRON_SCHEDULE = process.env.CRON_SCHEDULE || '0 */12 * * *'; // Default: Cada 12 horas
 const REPO_OWNER_NAME = process.env.GITHUB_REPO || 'AaronSGomez/MantenedorFreeSupabase';
 
 app.use(cors());

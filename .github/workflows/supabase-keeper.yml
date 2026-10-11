@@ -2,8 +2,8 @@ name: Supabase Keep-Alive Daily Ping
 
 on:
   schedule:
-    # Corre automáticamente todos los días a las 00:00 UTC (ajustable)
-    - cron: '0 0 * * *'
+    # Corre automáticamente cada 12 horas (00:00 y 12:00 UTC)
+    - cron: '0 */12 * * *'
   # Permite ejecutarlo manualmente desde la pestaña Actions en GitHub
   workflow_dispatch:
 
