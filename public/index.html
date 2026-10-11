@@ -2,13 +2,13 @@
 <html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Supalive · Automated Keep-Alive & Technical Showcase</title>
-  <meta name="description" content="Motor de latido continuo y biblioteca técnica para mantener activos proyectos de Supabase en plan gratuito.">
+  <meta name="description" content="Motor de latido continuo y biblioteca técnica para mantener activas bases de datos Supabase en plan gratuito.">
   <!-- Google Fonts: Syne & JetBrains Mono & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -33,7 +33,7 @@
           boxShadow: {
             'neon-emerald': '0 0 25px -3px rgba(16, 185, 129, 0.45), 0 0 10px -2px rgba(6, 182, 212, 0.3)',
             'neon-cyan': '0 0 25px -3px rgba(6, 182, 212, 0.4)',
-            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+            'soft-card': '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03)'
           }
         }
       }
@@ -42,10 +42,13 @@
   <style>
     /* Neon Glow & Smooth transitions */
     .neon-text {
-      background: linear-gradient(135deg, #34d399 0%, #00f59b 50%, #38bdf8 100%);
+      background: linear-gradient(135deg, #10b981 0%, #00f59b 45%, #06b6d4 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 22px rgba(16, 185, 129, 0.4));
+      filter: drop-shadow(0 0 25px rgba(16, 185, 129, 0.4));
+    }
+    .dark .neon-text {
+      filter: drop-shadow(0 0 30px rgba(0, 245, 155, 0.45));
     }
     .neon-border {
       position: relative;
@@ -56,7 +59,7 @@
       inset: -1px;
       border-radius: inherit;
       padding: 1px;
-      background: linear-gradient(135deg, rgba(52, 211, 153, 0.6), rgba(56, 189, 248, 0.2), transparent);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.5), rgba(6, 182, 212, 0.3), transparent);
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
@@ -68,240 +71,246 @@
     }
     @keyframes pulseGlow {
       0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
-      70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+      70% { box-shadow: 0 0 0 9px rgba(16, 185, 129, 0); }
       100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.4); }
+    /* Hide scrollbar for tabs */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased transition-colors duration-300 selection:bg-supa-500 selection:text-slate-950 dark:bg-[#070b14] light:bg-[#f8fafc] light:text-slate-800">
+<body class="bg-slate-50 text-slate-800 dark:bg-[#070b14] dark:text-slate-100 min-h-screen flex flex-col font-sans antialiased transition-colors duration-300 selection:bg-supa-500 selection:text-slate-950">
 
   <!-- Ambient Glow Background -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-emerald-500/15 via-teal-500/10 to-cyan-500/15 blur-[120px] rounded-full"></div>
-    <div class="absolute bottom-10 right-10 w-96 h-96 bg-emerald-600/10 blur-[130px] rounded-full"></div>
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[350px] sm:w-[700px] h-[300px] sm:h-[400px] bg-gradient-to-tr from-emerald-500/20 via-teal-400/15 to-cyan-500/20 dark:from-emerald-500/15 dark:via-teal-500/10 dark:to-cyan-500/15 blur-[90px] sm:blur-[130px] rounded-full"></div>
+    <div class="absolute bottom-10 right-0 sm:right-10 w-72 sm:w-96 h-72 sm:h-96 bg-purple-500/10 dark:bg-emerald-600/10 blur-[100px] sm:blur-[140px] rounded-full"></div>
   </div>
 
   <!-- Header / Navbar -->
-  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 dark:bg-[#070b14]/85 light:bg-white/85 backdrop-blur-xl transition-colors duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+  <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 dark:border-slate-800/80 dark:bg-[#070b14]/90 backdrop-blur-xl transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
       
-      <!-- Logo & Brand -->
-      <div class="flex items-center space-x-3.5">
-        <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-cyan-500 p-[1px] shadow-neon-emerald">
-          <div class="w-full h-full bg-slate-950 dark:bg-[#090e1a] rounded-2xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-supa-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-2.5 sm:space-x-3.5 min-w-0">
+        <div class="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-500 p-[1.5px] shadow-neon-emerald shrink-0">
+          <div class="w-full h-full bg-white dark:bg-[#090e1a] rounded-[10px] sm:rounded-2xl flex items-center justify-center">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500 dark:text-supa-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
           </div>
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-display font-extrabold text-2xl tracking-tight text-white dark:text-white light:text-slate-900">Supalive</span>
-            <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold">24/7 Engine</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <span class="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white truncate">Supalive</span>
+            <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-bold shrink-0">24/7 Engine</span>
           </div>
-          <p class="text-xs text-slate-400 dark:text-slate-400 light:text-slate-500 font-medium">Keep-Alive Engine & Biblioteca Técnica</p>
+          <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Keep-Alive Engine & Biblioteca Técnica</p>
         </div>
       </div>
 
       <!-- Navigation & Actions -->
-      <div class="flex items-center space-x-3">
-        <!-- Theme Toggle -->
-        <button onclick="toggleTheme()" id="theme-btn" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 dark:bg-slate-900/60 light:bg-slate-100 hover:border-slate-700 text-slate-300 dark:text-slate-300 light:text-slate-700 transition-all active:scale-95" title="Cambiar tema (Claro / Oscuro)">
-          <svg id="theme-moon-icon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-          <svg id="theme-sun-icon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+        
+        <!-- Theme Toggle (Moon / Sun) -->
+        <button onclick="toggleTheme()" id="theme-btn" class="p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 transition-all active:scale-95" title="Cambiar tema">
+          <!-- Sun icon (shown in dark mode to switch to light) -->
+          <svg id="theme-sun-icon" class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <!-- Moon icon (shown in light mode to switch to dark) -->
+          <svg id="theme-moon-icon" class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-700 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
         </button>
 
-        <!-- Ping All Action -->
-        <button onclick="pingAllProjects()" id="btn-ping-all" class="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-neon-emerald flex items-center gap-2 active:scale-95">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span id="btn-ping-all-text">Latido a Todos</span>
+        <!-- Ping All Action Button -->
+        <button onclick="pingAllProjects()" id="btn-ping-all" class="px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-neon-emerald flex items-center gap-1.5 sm:gap-2 active:scale-95 shrink-0">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span class="hidden sm:inline" id="btn-ping-all-text">Latido a Todos</span>
+          <span class="sm:hidden" id="btn-ping-all-text-mobile">Latido</span>
         </button>
       </div>
 
     </div>
   </header>
 
-  <!-- Hero Section & Showcase Header -->
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 w-full">
-    <div class="relative rounded-3xl p-8 sm:p-10 border border-slate-800/80 bg-gradient-to-b from-slate-900/60 to-slate-950/60 dark:from-slate-900/40 dark:to-[#080d1a]/80 backdrop-blur-2xl overflow-hidden neon-border">
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-4 w-full">
+    <div class="relative rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-slate-200/90 bg-white/90 dark:border-slate-800/80 dark:bg-gradient-to-b dark:from-slate-900/50 dark:to-[#080d1a]/85 backdrop-blur-2xl overflow-hidden neon-border shadow-soft-card dark:shadow-none">
       
       <!-- Tech Badge -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 mb-5">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-glow"></span>
-        <span>Dual-Engine Heartbeat: GitHub Actions (12h) + Serverless REST</span>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30 mb-4 sm:mb-5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 pulse-glow"></span>
+        <span class="truncate">Dual-Engine: GitHub Actions (12h) + Serverless REST</span>
       </div>
 
       <!-- Main Neon Title -->
-      <h1 class="text-4xl sm:text-6xl font-display font-extrabold tracking-tight mb-4">
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight mb-3 sm:mb-4">
         <span class="neon-text">Supalive</span>
-        <span class="block text-2xl sm:text-3xl font-sans font-medium text-slate-300 mt-2">
+        <span class="block text-xl sm:text-2xl lg:text-3xl font-sans font-medium text-slate-700 dark:text-slate-300 mt-1 sm:mt-2">
           Infraestructura de latidos continuos para bases de datos Supabase
         </span>
       </h1>
 
-      <p class="text-slate-400 text-sm sm:text-base max-w-3xl leading-relaxed font-normal">
-        Un sistema automatizado de preservación de bases de datos PostgreSQL en el plan gratuito. 
-        Evita la hibernación por 7 días de inactividad ejecutando latidos HTTP autenticados cada 12 horas con arquitectura de cero coste y cifrado extremo a extremo.
+      <p class="text-slate-600 dark:text-slate-400 text-xs sm:text-sm lg:text-base max-w-3xl leading-relaxed font-normal">
+        Preservación automatizada de bases de datos PostgreSQL en el plan gratuito. 
+        Previene la hibernación forzosa tras 7 días de inactividad enviando latidos HTTP autenticados cada 12 horas con cero costes y privacidad absoluta.
       </p>
 
       <!-- Quick Metrics Ribbon -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-8 border-t border-slate-800/80">
-        <div class="space-y-1">
-          <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Proyectos Monitoreados</p>
-          <p class="text-2xl font-bold text-white font-mono" id="hero-total-count">4</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-slate-200 dark:border-slate-800/80">
+        <div class="p-3 sm:p-0 rounded-xl bg-slate-50 dark:bg-transparent border border-slate-200/60 dark:border-0 space-y-0.5 sm:space-y-1">
+          <p class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Bases de Datos</p>
+          <p class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-mono" id="hero-total-count">4</p>
         </div>
-        <div class="space-y-1">
-          <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Estado de la Flota</p>
-          <p class="text-2xl font-bold text-emerald-400 font-mono flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-glow"></span>
+
+        <div class="p-3 sm:p-0 rounded-xl bg-slate-50 dark:bg-transparent border border-slate-200/60 dark:border-0 space-y-0.5 sm:space-y-1">
+          <p class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Estado de Flota</p>
+          <p class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 pulse-glow"></span>
             100% Warm
           </p>
         </div>
-        <div class="space-y-1">
-          <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Ciclo Automático</p>
-          <p class="text-2xl font-bold text-cyan-400 font-mono">Cada 12h</p>
+
+        <div class="p-3 sm:p-0 rounded-xl bg-slate-50 dark:bg-transparent border border-slate-200/60 dark:border-0 space-y-0.5 sm:space-y-1">
+          <p class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Frecuencia Nube</p>
+          <p class="text-xl sm:text-2xl font-bold text-cyan-600 dark:text-cyan-400 font-mono">Cada 12h</p>
         </div>
-        <div class="space-y-1">
-          <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Último Latido Nube</p>
-          <p class="text-sm font-semibold text-slate-200 font-mono mt-1" id="hero-cloud-last">Consultando...</p>
+
+        <div class="p-3 sm:p-0 rounded-xl bg-slate-50 dark:bg-transparent border border-slate-200/60 dark:border-0 space-y-0.5 sm:space-y-1">
+          <p class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">Último Latido Nube</p>
+          <p class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 font-mono mt-0.5" id="hero-cloud-last">Consultando...</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Technical Library & Navigation Tabs -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-1 w-full space-y-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-1 w-full space-y-6 sm:space-y-8">
     
-    <!-- Tab Controls -->
-    <div class="flex items-center space-x-2 border-b border-slate-800/80 pb-px">
-      <button onclick="switchTab('showcase')" id="tab-btn-showcase" class="px-5 py-3 text-sm font-semibold text-emerald-400 border-b-2 border-emerald-400 flex items-center gap-2 transition-all">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+    <!-- Tab Controls (Swipeable on mobile) -->
+    <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0">
+      
+      <button onclick="switchTab('showcase')" id="tab-btn-showcase" class="px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 flex items-center gap-2 transition-all shrink-0">
+        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
         <span>Showcase de Mantenedores</span>
       </button>
 
-      <button onclick="switchTab('library')" id="tab-btn-library" class="px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all">
+      <button onclick="switchTab('library')" id="tab-btn-library" class="px-4 sm:px-5 py-3 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
         <span>Biblioteca Técnica & Arquitectura</span>
       </button>
 
-      <button onclick="switchTab('cloud')" id="tab-btn-cloud" class="px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all">
+      <button onclick="switchTab('cloud')" id="tab-btn-cloud" class="px-4 sm:px-5 py-3 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
         <span>Motor Cloud (GitHub Actions)</span>
       </button>
     </div>
 
     <!-- TAB 1: SHOWCASE DE MANTENEDORES -->
-    <div id="tab-showcase" class="space-y-6">
+    <div id="tab-showcase" class="space-y-5 sm:space-y-6">
       
-      <!-- Section Intro -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <!-- Section Subheading -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span>Bases de Datos en Monitoreo Continuo</span>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono">End-to-End Encrypted</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">SSL Encrypted</span>
           </h2>
-          <p class="text-xs text-slate-400 mt-1">Los identificadores de proyecto y endpoints se encuentran ofuscados por privacidad. Cada base de datos recibe un latido autenticado cada 12 horas.</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Endpoints protegidos y ofuscados para preservar la privacidad de los proyectos.</p>
         </div>
 
-        <div class="text-xs text-slate-400 font-mono flex items-center gap-2 bg-slate-900/60 px-3.5 py-2 rounded-xl border border-slate-800">
-          <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>Credenciales Protegidas</span>
+        <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center gap-2 bg-white dark:bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0">
+          <svg class="w-3.5 h-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Credenciales Privadas</span>
         </div>
       </div>
 
       <!-- Project Cards Grid -->
-      <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
         <!-- Rendered via JS -->
       </div>
     </div>
 
     <!-- TAB 2: BIBLIOTECA TÉCNICA -->
-    <div id="tab-library" class="hidden space-y-8">
+    <div id="tab-library" class="hidden space-y-6 sm:space-y-8">
       
       <!-- Tech Overview Cards -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         
-        <!-- Card 1 -->
-        <div class="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold font-mono">
+        <!-- Pillar 1 -->
+        <div class="p-6 rounded-2xl bg-white border border-slate-200/90 dark:bg-slate-900/50 dark:border-slate-800 space-y-4 shadow-soft-card dark:shadow-none">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold font-mono">
             01
           </div>
-          <h3 class="text-lg font-bold text-white">El Problema de los 7 Días</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Supabase opera sobre infraestructura PostgreSQL en contenedores independientes. Para optimizar recursos en su plan gratuito, aplica una política estricta de <strong class="text-slate-200">168 horas (7 días)</strong> de inactividad continua. Si una base de datos no recibe peticiones durante ese lapso, la instancia se apaga (<em>Paused state</em>).
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">El Problema de los 7 Días</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Supabase asigna contenedores dedicados para cada proyecto PostgreSQL. Para rentabilizar recursos en el nivel gratuito, suspende automáticamente las instancias que acumulen <strong class="text-slate-900 dark:text-slate-200">168 horas (7 días)</strong> sin tráfico de red.
           </p>
-          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] font-mono text-amber-300/90">
-            ⚠️ Consecuencia: Cold starts de 30-45 segundos o errores 503 en la primera petición de tus usuarios.
+          <div class="p-3 bg-amber-50/80 dark:bg-slate-950/60 rounded-xl border border-amber-200 dark:border-slate-800 text-[11px] font-mono text-amber-800 dark:text-amber-300">
+            ⚠️ Consecuencia: Cold starts de 30-45s y posibles timeouts para los primeros usuarios.
           </div>
         </div>
 
-        <!-- Card 2 -->
-        <div class="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold font-mono">
+        <!-- Pillar 2 -->
+        <div class="p-6 rounded-2xl bg-white border border-slate-200/90 dark:bg-slate-900/50 dark:border-slate-800 space-y-4 shadow-soft-card dark:shadow-none">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold font-mono">
             02
           </div>
-          <h3 class="text-lg font-bold text-white">Mecanismo de Latido Supalive</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Supalive envía peticiones HTTP autenticadas con encabezados <code class="text-emerald-400">apikey</code> y <code class="text-emerald-400">Authorization: Bearer</code> a la capa PostgREST. 
-            Al procesar la firma del token criptográfico y consultar el catálogo interno de PostgreSQL, el contador de inactividad se reinicia a <strong class="text-emerald-400">cero</strong>.
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Mecanismo de Latido Supalive</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Supalive envía peticiones GET autenticadas con encabezados <code class="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">apikey</code> y <code class="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">Authorization: Bearer</code> al endpoint PostgREST. 
+            El motor valida el token criptográfico y reinicia el contador de inactividad de Supabase a <strong class="text-emerald-600 dark:text-emerald-400">cero</strong>.
           </p>
-          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] font-mono text-emerald-300/90">
-            ✅ Garantía: Frecuencia de 12 horas = 14 latidos semanales (13 latidos de margen de seguridad).
+          <div class="p-3 bg-emerald-50/80 dark:bg-slate-950/60 rounded-xl border border-emerald-200 dark:border-slate-800 text-[11px] font-mono text-emerald-800 dark:text-emerald-300">
+            ✅ Margen de Seguridad: Ejecución cada 12h = 14 pings semanales (13 pings de colchón).
           </div>
         </div>
 
-        <!-- Card 3 -->
-        <div class="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
-          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold font-mono">
+        <!-- Pillar 3 -->
+        <div class="p-6 rounded-2xl bg-white border border-slate-200/90 dark:bg-slate-900/50 dark:border-slate-800 space-y-4 shadow-soft-card dark:shadow-none">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/25 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold font-mono">
             03
           </div>
-          <h3 class="text-lg font-bold text-white">Arquitectura Zero-Trust</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Las credenciales residen en <strong class="text-slate-200">GitHub Secrets</strong> (encriptación asimétrica Libsodium) y variables de entorno seguras de Vercel. 
-            El cliente público nunca recibe la URL completa ni las claves API: todos los identificadores son enmascarados criptográficamente.
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Arquitectura Zero-Trust</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Las credenciales reales residen en <strong class="text-slate-900 dark:text-slate-200">GitHub Secrets</strong> (cifrado asimétrico Libsodium) y variables de entorno Vercel. 
+            El cliente web público nunca recibe las URLs completas ni las claves API reales: todo se procesa en el backend.
           </p>
-          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] font-mono text-cyan-300/90">
-            🔒 Seguridad: El repositorio y el showcase son 100% públicos sin riesgo alguno de fuga.
+          <div class="p-3 bg-cyan-50/80 dark:bg-slate-950/60 rounded-xl border border-cyan-200 dark:border-slate-800 text-[11px] font-mono text-cyan-800 dark:text-cyan-300">
+            🔒 Seguridad: El repositorio y showcase son 100% públicos sin riesgo de fuga.
           </div>
         </div>
 
       </div>
 
-      <!-- Visual Sequence Diagram -->
-      <div class="p-8 rounded-3xl bg-slate-900/40 border border-slate-800/80 space-y-6">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <svg class="w-5 h-5 text-supa-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          Flujo de Ejecución del Latido
+      <!-- Sequence Steps Diagram -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 dark:bg-slate-900/40 dark:border-slate-800/80 space-y-5 shadow-soft-card dark:shadow-none">
+        <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <svg class="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span>Flujo de Ejecución del Latido</span>
         </h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
-          <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
-            <span class="text-[10px] text-slate-500 uppercase">Paso 1 · Cron Disparador</span>
-            <p class="text-white font-semibold">GitHub Actions Scheduler</p>
-            <p class="text-slate-400 text-[11px]">Se dispara cada 12 horas (00:00 y 12:00 UTC) en runner aislado Ubuntu.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs font-mono">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950/80 dark:border-slate-800 space-y-1.5">
+            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase">01 · Disparador Cron</span>
+            <p class="text-slate-900 dark:text-white font-semibold">GitHub Actions Scheduler</p>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Se activa cada 12h (00:00 y 12:00 UTC) en runner aislado Ubuntu.</p>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
-            <span class="text-[10px] text-slate-500 uppercase">Paso 2 · Carga Cifrada</span>
-            <p class="text-white font-semibold">Inyección de Secrets</p>
-            <p class="text-slate-400 text-[11px]">Carga el arreglo JSON de proyectos desde <code>secrets.SUPABASE_PROJECTS</code> con enmascaramiento.</p>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950/80 dark:border-slate-800 space-y-1.5">
+            <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase">02 · Inyección Segura</span>
+            <p class="text-slate-900 dark:text-white font-semibold">Inyección de Secrets</p>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Carga el arreglo JSON desde <code>SUPABASE_PROJECTS</code> con máscara activa.</p>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
-            <span class="text-[10px] text-slate-500 uppercase">Paso 3 · Petición HTTP</span>
-            <p class="text-white font-semibold">PostgREST Gateway</p>
-            <p class="text-slate-400 text-[11px]">Fetch autenticado a <code>/rest/v1/</code> con API key. Despierta el pooler de PostgreSQL.</p>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950/80 dark:border-slate-800 space-y-1.5">
+            <span class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase">03 · Conexión HTTP</span>
+            <p class="text-slate-900 dark:text-white font-semibold">PostgREST Gateway</p>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">GET autenticado a <code>/rest/v1/</code>. Despierta el pooler PostgreSQL.</p>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
-            <span class="text-[10px] text-slate-500 uppercase">Paso 4 · Reinicio de Reloj</span>
-            <p class="text-white font-semibold">7 Días ➔ 0 Días</p>
-            <p class="text-slate-400 text-[11px]">Supabase registra actividad en métricas de API y mantiene el contenedor en caliente.</p>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950/80 dark:border-slate-800 space-y-1.5">
+            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase">04 · Reinicio de Reloj</span>
+            <p class="text-slate-900 dark:text-white font-semibold">7 Días ➔ 0 Días</p>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Supabase computa actividad de API y mantiene el contenedor despierto.</p>
           </div>
         </div>
       </div>
@@ -309,28 +318,28 @@
     </div>
 
     <!-- TAB 3: MOTOR CLOUD (GITHUB ACTIONS) -->
-    <div id="tab-cloud" class="hidden space-y-6">
+    <div id="tab-cloud" class="hidden space-y-5 sm:space-y-6">
       
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span>Historial en Tiempo Real de GitHub Actions</span>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">Live API</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/25">Live API</span>
           </h2>
-          <p class="text-xs text-slate-400 mt-1">Registros públicos consultados directamente desde la API oficial de GitHub sin necesidad de base de datos externa.</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Auditoría pública e inmutable consultada directamente desde GitHub sin base de datos externa.</p>
         </div>
 
-        <button onclick="fetchCloudStatus()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5 active:scale-95">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 11-.57-8.38l5.67-5.67"/></svg>
+        <button onclick="fetchCloudStatus()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-1.5 active:scale-95 shrink-0">
+          <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 11-.57-8.38l5.67-5.67"/></svg>
           Actualizar Registros
         </button>
       </div>
 
       <!-- Cloud Runs Table -->
-      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/50 overflow-hidden shadow-sm">
+      <div class="rounded-2xl border border-slate-200 bg-white dark:border-slate-800/80 dark:bg-slate-900/50 overflow-hidden shadow-soft-card dark:shadow-none">
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-mono text-slate-300">
-            <thead class="bg-slate-950/60 text-slate-400 border-b border-slate-800 uppercase text-[10px] tracking-wider">
+          <table class="w-full text-left text-xs font-mono text-slate-700 dark:text-slate-300 min-w-[560px]">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 dark:bg-slate-950/60 dark:text-slate-400 dark:border-slate-800 uppercase text-[10px] tracking-wider">
               <tr>
                 <th class="px-4 py-3">Flujo de Trabajo</th>
                 <th class="px-4 py-3">Disparador</th>
@@ -340,9 +349,9 @@
                 <th class="px-4 py-3 text-right">Verificación</th>
               </tr>
             </thead>
-            <tbody id="cloud-tbody" class="divide-y divide-slate-800/60">
+            <tbody id="cloud-tbody" class="divide-y divide-slate-100 dark:divide-slate-800/60">
               <tr>
-                <td colspan="6" class="px-4 py-8 text-center text-slate-500 font-sans">Consultando ejecuciones en la nube...</td>
+                <td colspan="6" class="px-4 py-8 text-center text-slate-400 font-sans">Consultando ejecuciones en la nube...</td>
               </tr>
             </tbody>
           </table>
@@ -354,19 +363,19 @@
   </main>
 
   <!-- Footer -->
-  <footer class="mt-auto border-t border-slate-800/80 py-8 bg-slate-950/60 text-center text-xs text-slate-500 font-mono">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <footer class="mt-auto border-t border-slate-200 dark:border-slate-800/80 py-6 sm:py-8 bg-white/60 dark:bg-slate-950/60 text-center text-xs text-slate-500 dark:text-slate-400 font-mono transition-colors">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p>Supalive · Infraestructura de latido continuo para Supabase</p>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3">
         <span>Cron: <code>0 */12 * * *</code></span>
         <span>•</span>
-        <span>Zero Cost Cloud Architecture</span>
+        <span>Zero-Cost Cloud</span>
       </div>
     </div>
   </footer>
 
   <!-- Toast Notifications Container -->
-  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col space-y-2 pointer-events-none max-w-[90vw]"></div>
 
   <!-- SCRIPT LOGIC -->
   <script>
@@ -376,7 +385,7 @@
     const STORAGE_KEY_PINGS = 'supalive_last_pings';
     const STORAGE_KEY_THEME = 'supalive_theme';
 
-    // Theme Management
+    // Theme Management (Light / Dark)
     function initTheme() {
       const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'dark';
       if (savedTheme === 'light') {
@@ -384,6 +393,7 @@
       } else {
         document.documentElement.classList.add('dark');
       }
+      updateThemeIcons();
     }
 
     function toggleTheme() {
@@ -395,9 +405,26 @@
         document.documentElement.classList.add('dark');
         localStorage.setItem(STORAGE_KEY_THEME, 'dark');
       }
+      updateThemeIcons();
+      renderProjects(); // Re-render project cards with proper theme classes
     }
 
-    // Client Ping Storage (persistente en localStorage para que en Vercel nunca se pierda)
+    function updateThemeIcons() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const sunIcon = document.getElementById('theme-sun-icon');
+      const moonIcon = document.getElementById('theme-moon-icon');
+      if (sunIcon && moonIcon) {
+        if (isDark) {
+          sunIcon.classList.remove('hidden');
+          moonIcon.classList.add('hidden');
+        } else {
+          sunIcon.classList.add('hidden');
+          moonIcon.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Client Ping Storage (persistente en localStorage)
     function getStoredPings() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY_PINGS) || '{}');
@@ -422,10 +449,10 @@
         const btn = document.getElementById(`tab-btn-${t}`);
         if (t === tabId) {
           content.classList.remove('hidden');
-          btn.className = 'px-5 py-3 text-sm font-semibold text-emerald-400 border-b-2 border-emerald-400 flex items-center gap-2 transition-all';
+          btn.className = 'px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 flex items-center gap-2 transition-all shrink-0';
         } else {
           content.classList.add('hidden');
-          btn.className = 'px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all';
+          btn.className = 'px-4 sm:px-5 py-3 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all shrink-0';
         }
       });
     }
@@ -446,11 +473,12 @@
     function renderProjects() {
       const grid = document.getElementById('projects-grid');
       const storedPings = getStoredPings();
+      const isDark = document.documentElement.classList.contains('dark');
 
       if (stateProjects.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-2 text-center py-16 border border-dashed border-slate-800 rounded-3xl bg-slate-900/30">
-            <p class="text-sm text-slate-400">No se detectaron proyectos configurados.</p>
+          <div class="col-span-1 md:col-span-2 text-center py-16 border border-dashed border-slate-300 dark:border-slate-800 rounded-3xl bg-white/60 dark:bg-slate-900/30">
+            <p class="text-sm text-slate-500 dark:text-slate-400">No se detectaron proyectos configurados.</p>
           </div>
         `;
         return;
@@ -459,7 +487,6 @@
       document.getElementById('hero-total-count').innerText = stateProjects.length;
 
       grid.innerHTML = stateProjects.map(p => {
-        // Combinar con almacenamiento persistente local
         const lastPing = storedPings[p.id] || p.lastPing;
         const hasPing = Boolean(lastPing);
         const latency = hasPing ? lastPing.latencyMs : null;
@@ -470,55 +497,55 @@
           : 'Esperando primer latido';
 
         // Latency color gauge
-        let latencyBadgeColor = 'text-slate-400 bg-slate-800/60 border-slate-700';
+        let latencyBadgeColor = 'text-slate-600 bg-slate-100 border-slate-200 dark:text-slate-400 dark:bg-slate-800/60 dark:border-slate-700';
         if (latency !== null) {
-          if (latency < 250) latencyBadgeColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
-          else if (latency < 600) latencyBadgeColor = 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30';
-          else latencyBadgeColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+          if (latency < 250) latencyBadgeColor = 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-500/10 dark:border-emerald-500/30';
+          else if (latency < 600) latencyBadgeColor = 'text-cyan-700 bg-cyan-50 border-cyan-200 dark:text-cyan-400 dark:bg-cyan-500/10 dark:border-cyan-500/30';
+          else latencyBadgeColor = 'text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-500/10 dark:border-amber-500/30';
         }
 
         return `
-          <div class="p-6 rounded-3xl border border-slate-800/80 bg-slate-900/50 dark:bg-slate-900/40 backdrop-blur-xl relative overflow-hidden transition-all duration-300 hover:border-emerald-500/40 hover:shadow-neon-emerald/20 flex flex-col justify-between">
+          <div class="p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/50 backdrop-blur-xl shadow-soft-card dark:shadow-none hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between">
             
             <!-- Card Header -->
             <div>
-              <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="space-y-1">
+              <div class="flex items-start justify-between gap-2.5 mb-3">
+                <div class="space-y-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <h3 class="text-lg font-bold text-white tracking-tight">${escapeHtml(p.name)}</h3>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-glow"></span>
+                    <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight truncate">${escapeHtml(p.name)}</h3>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1 shrink-0">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 pulse-glow"></span>
                       Warm
                     </span>
                   </div>
-                  <!-- Protected URL badge (No es un enlace clickable a la API con error) -->
-                  <div class="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
-                    <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    <span class="truncate text-slate-300 font-medium" title="Endpoint protegido con SSL">${escapeHtml(p.urlMasked || p.url || 'https://••••••••.supabase.co')}</span>
+                  <!-- Protected URL badge (Non-clickable) -->
+                  <div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-mono">
+                    <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <span class="truncate text-slate-700 dark:text-slate-300 font-medium" title="Endpoint protegido con SSL">${escapeHtml(p.urlMasked || p.url || 'https://••••••••.supabase.co')}</span>
                   </div>
                 </div>
 
                 <!-- Strategy Pill -->
-                <span class="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 shrink-0">
                   ${p.target === 'auth' ? 'Auth Health' : (p.target === 'table' ? 'Table Query' : 'REST Root')}
                 </span>
               </div>
 
               <!-- Metric Strip -->
-              <div class="grid grid-cols-2 gap-3 my-5 p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80">
+              <div class="grid grid-cols-2 gap-2 sm:gap-3 my-4 sm:my-5 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80 dark:bg-slate-950/70 dark:border-slate-800/80">
                 <div>
-                  <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 block">Latencia de Respuesta</span>
-                  <div class="flex items-center gap-2 mt-1">
-                    <span class="text-sm font-bold font-mono px-2 py-0.5 rounded-lg border ${latencyBadgeColor}" id="lat-${p.id}">
+                  <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-slate-500 block">Latencia</span>
+                  <div class="flex items-center gap-1.5 mt-1">
+                    <span class="text-xs sm:text-sm font-bold font-mono px-2 py-0.5 rounded-lg border ${latencyBadgeColor}" id="lat-${p.id}">
                       ${latencyText}
                     </span>
-                    ${httpStatus ? `<span class="text-[11px] font-mono text-slate-400">HTTP ${httpStatus}</span>` : ''}
+                    ${httpStatus ? `<span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">HTTP ${httpStatus}</span>` : ''}
                   </div>
                 </div>
 
                 <div>
-                  <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 block">Último Latido</span>
-                  <p class="text-xs font-mono font-medium text-slate-300 mt-1" id="time-${p.id}">
+                  <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-slate-500 block">Último Latido</span>
+                  <p class="text-xs font-mono font-medium text-slate-800 dark:text-slate-200 mt-1" id="time-${p.id}">
                     ${timestampText}
                   </p>
                 </div>
@@ -526,14 +553,14 @@
             </div>
 
             <!-- Card Action Footer -->
-            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
-              <span class="text-[11px] text-slate-400 font-mono flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <div class="pt-3 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between gap-2">
+              <span class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 Inactividad evitada
               </span>
 
-              <button onclick="pingSingleProject('${p.id}', this)" class="px-3.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-1.5 active:scale-95">
-                <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <button onclick="pingSingleProject('${p.id}', this)" class="px-3 sm:px-3.5 py-1.5 sm:py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300/80 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-1.5 active:scale-95 shrink-0">
+                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 <span>Enviar Latido</span>
               </button>
             </div>
@@ -547,7 +574,7 @@
     async function pingSingleProject(id, buttonEl) {
       if (buttonEl) {
         buttonEl.disabled = true;
-        buttonEl.innerHTML = `<svg class="w-3.5 h-3.5 animate-spin text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"/></svg><span>Enviando...</span>`;
+        buttonEl.innerHTML = `<svg class="w-3.5 h-3.5 animate-spin text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"/></svg><span>Enviando...</span>`;
       }
 
       showToast('Enviando latido a Supabase...', 'info');
@@ -573,9 +600,11 @@
     async function pingAllProjects() {
       const btn = document.getElementById('btn-ping-all');
       const btnText = document.getElementById('btn-ping-all-text');
+      const btnTextMobile = document.getElementById('btn-ping-all-text-mobile');
       btn.disabled = true;
-      btnText.innerText = 'Enviando...';
-      showToast('Enviando latido masivo a todas las bases de datos...', 'info');
+      if (btnText) btnText.innerText = 'Enviando...';
+      if (btnTextMobile) btnTextMobile.innerText = '...';
+      showToast('Enviando latido a todas las bases de datos...', 'info');
 
       try {
         const res = await fetch('/api/ping-all', { method: 'POST' });
@@ -585,7 +614,7 @@
             saveStoredPing(r.projectId, r);
           });
           renderProjects();
-          showToast(`¡Latidos completados! ${data.summary.success} proyectos verificados en caliente.`, 'success');
+          showToast(`¡Latidos completados! ${data.summary.success} bases de datos verificadas.`, 'success');
         } else {
           showToast(data.error || 'Error durante el latido masivo', 'error');
         }
@@ -593,7 +622,8 @@
         showToast('Error de conexión', 'error');
       } finally {
         btn.disabled = false;
-        btnText.innerText = 'Latido a Todos';
+        if (btnText) btnText.innerText = 'Latido a Todos';
+        if (btnTextMobile) btnTextMobile.innerText = 'Latido';
       }
     }
 
@@ -614,15 +644,15 @@
 
       if (!stateCloud || !stateCloud.available || !stateCloud.latestRun) {
         if (heroLast) heroLast.innerText = 'Activo cada 12h';
-        if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500 font-sans">No se pudieron consultar ejecuciones de GitHub Actions.</td></tr>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 font-sans">No se pudieron consultar ejecuciones de GitHub Actions.</td></tr>`;
         return;
       }
 
       const run = stateCloud.latestRun;
       if (heroLast) {
         heroLast.innerHTML = `
-          <span class="text-emerald-400 font-bold">✓ Éxito</span> 
-          <span class="text-xs text-slate-400 font-normal">(${new Date(run.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})</span>
+          <span class="text-emerald-600 dark:text-emerald-400 font-bold">✓ Éxito</span> 
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-normal">(${new Date(run.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})</span>
         `;
       }
 
@@ -630,18 +660,18 @@
         tbody.innerHTML = stateCloud.runs.map(r => {
           const isSuccess = r.conclusion === 'success';
           const badge = isSuccess
-            ? `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">ÉXITO ✓</span>`
-            : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">${(r.conclusion || r.status || 'EN CURSO').toUpperCase()}</span>`;
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30">ÉXITO ✓</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30">${(r.conclusion || r.status || 'EN CURSO').toUpperCase()}</span>`;
 
           return `
-            <tr class="hover:bg-slate-800/30 transition-colors">
-              <td class="px-4 py-3 font-semibold text-white">${escapeHtml(r.name)}</td>
-              <td class="px-4 py-3 text-slate-400">${escapeHtml(r.event)}</td>
-              <td class="px-4 py-3 text-slate-300">${escapeHtml(r.status)}</td>
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+              <td class="px-4 py-3 font-semibold text-slate-900 dark:text-white">${escapeHtml(r.name)}</td>
+              <td class="px-4 py-3 text-slate-500 dark:text-slate-400">${escapeHtml(r.event)}</td>
+              <td class="px-4 py-3 text-slate-700 dark:text-slate-300">${escapeHtml(r.status)}</td>
               <td class="px-4 py-3">${badge}</td>
-              <td class="px-4 py-3 text-slate-400">${new Date(r.created_at).toLocaleString()}</td>
+              <td class="px-4 py-3 text-slate-500 dark:text-slate-400">${new Date(r.created_at).toLocaleString()}</td>
               <td class="px-4 py-3 text-right">
-                <a href="${r.html_url}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg text-[11px] font-medium inline-flex items-center gap-1 border border-slate-700 transition-all">
+                <a href="${r.html_url}" target="_blank" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-cyan-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-cyan-400 rounded-lg text-[11px] font-medium inline-flex items-center gap-1 border border-slate-200 dark:border-slate-700 transition-all">
                   Registro en GitHub ↗
                 </a>
               </td>
@@ -657,9 +687,9 @@
       const toast = document.createElement('div');
       
       const colors = {
-        success: 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200',
-        error: 'bg-red-950/90 border-red-500/40 text-red-200',
-        info: 'bg-slate-900/90 border-slate-700 text-white'
+        success: 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200',
+        error: 'bg-red-950/95 border-red-500/50 text-red-200',
+        info: 'bg-slate-900/95 border-slate-700 text-white'
       };
 
       toast.className = `pointer-events-auto px-4 py-3 rounded-2xl border text-xs font-mono font-medium shadow-2xl backdrop-blur-xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 ${colors[type] || colors.info}`;
