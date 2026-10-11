@@ -18,7 +18,7 @@ function renderHeader(containerId) {
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2">
-              <span class="font-sans font-extrabold text-xl sm:text-2xl tracking-tight text-white">Supalive</span>
+              <span class="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-white">Supalive</span>
               <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold shrink-0">Manual & Keep-Alive</span>
             </div>
             <p class="hidden sm:block text-xs text-slate-400 font-mono truncate">Manual técnico y mantenedor autónomo de bases de datos Supabase</p>
