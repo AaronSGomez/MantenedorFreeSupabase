@@ -205,35 +205,70 @@ app.all(['/api/ping-all', '/api/cron'], async (req, res) => {
 // ----------------------------------------------------
 
 // Get GitHub Actions Latest Runs Status
-app.get('/api/github/runs', (req, res) => {
-  const cmd = `gh api repos/${REPO_OWNER_NAME}/actions/runs --jq ".workflow_runs[0:5] | map({id, name, status, conclusion, created_at, updated_at, html_url, event})"`;
-
-  exec(cmd, (error, stdout, stderr) => {
-    if (error) {
-      // Return graceful empty state if gh CLI is not configured or offline
-      return res.json({
-        available: false,
-        message: 'No se pudo conectar con GitHub CLI o la API de GitHub.',
-        runs: []
-      });
+app.get('/api/github/runs', async (req, res) => {
+  try {
+    const headers = {
+      'User-Agent': 'MantenedorSupabase/1.0',
+      'Accept': 'application/vnd.github.v3+json'
+    };
+    if (process.env.GH_TOKEN) {
+      headers['Authorization'] = `Bearer ${process.env.GH_TOKEN}`;
     }
 
-    try {
-      const runs = JSON.parse(stdout || '[]');
-      res.json({
+    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER_NAME}/actions/runs?per_page=5`, {
+      headers
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const runs = (data.workflow_runs || []).map(r => ({
+        id: r.id,
+        name: r.name,
+        status: r.status,
+        conclusion: r.conclusion,
+        created_at: r.created_at,
+        updated_at: r.updated_at,
+        html_url: r.html_url,
+        event: r.event
+      }));
+
+      return res.json({
         available: true,
         repo: REPO_OWNER_NAME,
         latestRun: runs[0] || null,
         runs
       });
-    } catch (parseErr) {
-      res.json({
-        available: false,
-        message: 'Error al analizar respuesta de GitHub API',
-        runs: []
-      });
     }
-  });
+
+    // Fallback local con gh CLI si la API pública rate limit o error
+    const cmd = `gh api repos/${REPO_OWNER_NAME}/actions/runs --jq ".workflow_runs[0:5] | map({id, name, status, conclusion, created_at, updated_at, html_url, event})"`;
+    exec(cmd, (error, stdout) => {
+      if (error) {
+        return res.json({
+          available: false,
+          message: 'No se pudo conectar con la API de GitHub.',
+          runs: []
+        });
+      }
+      try {
+        const runs = JSON.parse(stdout || '[]');
+        res.json({
+          available: true,
+          repo: REPO_OWNER_NAME,
+          latestRun: runs[0] || null,
+          runs
+        });
+      } catch (e) {
+        res.json({ available: false, message: 'Error al procesar respuesta', runs: [] });
+      }
+    });
+  } catch (err) {
+    res.json({
+      available: false,
+      message: 'Error al consultar GitHub: ' + err.message,
+      runs: []
+    });
+  }
 });
 
 // Trigger GitHub Actions Workflow remotely from Web Dashboard
