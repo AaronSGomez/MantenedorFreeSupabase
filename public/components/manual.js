@@ -13,7 +13,7 @@ function renderManual(containerId) {
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/25">
           <span>Manual de Ingeniería · v2.0</span>
         </div>
-        <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h2 class="text-2xl sm:text-3xl font-sans font-extrabold text-slate-900 dark:text-white tracking-tight">
           Guía Completa: Mantén tus Proyectos Supabase Vivos sin Tráfico Orgánico Diario
         </h2>
         <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
