@@ -189,7 +189,22 @@ app.delete('/api/projects/:id', (req, res) => {
 app.post('/api/projects/:id/ping', async (req, res) => {
   const { id } = req.params;
   const projects = getProjects();
-  const project = projects.find(p => p.id === id);
+  let project = projects.find(p => p.id === id);
+
+  // Fallback por slug o nombre normalizado si el cliente tuviera un ID previo
+  if (!project) {
+    const cleanId = id.toLowerCase().replace(/[^a-z0-9]/g, '');
+    project = projects.find(p => {
+      const pId = (p.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const pName = (p.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      return pId === cleanId || pName === cleanId || pId.includes(cleanId) || cleanId.includes(pId);
+    });
+  }
+
+  // Fallback si pasaron índice numérico
+  if (!project && !isNaN(parseInt(id))) {
+    project = projects[parseInt(id)];
+  }
 
   if (!project) {
     return res.status(404).json({ error: 'Proyecto no encontrado.' });

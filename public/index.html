@@ -9,6 +9,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <script>
+    // Silenciar aviso informativo de cdn.tailwindcss.com en consola
+    const _origWarn = console.warn;
+    console.warn = function(...args) {
+      if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+      _origWarn.apply(console, args);
+    };
+  </script>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -433,12 +441,17 @@
       }
     }
 
-    function saveStoredPing(projectId, pingData) {
+    function saveStoredPing(projectId, projectName, pingData) {
       const pings = getStoredPings();
-      pings[projectId] = {
+      const data = {
         ...pingData,
         timestamp: pingData.timestamp || new Date().toISOString()
       };
+      if (projectId) pings[projectId] = data;
+      if (projectName) {
+        const key = 'name_' + projectName.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+        pings[key] = data;
+      }
       localStorage.setItem(STORAGE_KEY_PINGS, JSON.stringify(pings));
     }
 
@@ -486,8 +499,9 @@
 
       document.getElementById('hero-total-count').innerText = stateProjects.length;
 
-      grid.innerHTML = stateProjects.map(p => {
-        const lastPing = storedPings[p.id] || p.lastPing;
+      grid.innerHTML = stateProjects.map((p, index) => {
+        const nameKey = 'name_' + (p.name || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+        const lastPing = storedPings[p.id] || storedPings[nameKey] || p.lastPing;
         const hasPing = Boolean(lastPing);
         const latency = hasPing ? lastPing.latencyMs : null;
         const latencyText = latency !== null ? `${latency} ms` : '—';
@@ -583,7 +597,7 @@
         const res = await fetch(`/api/projects/${id}/ping`, { method: 'POST' });
         const data = await res.json();
         if (res.ok && data.result) {
-          saveStoredPing(id, data.result);
+          saveStoredPing(id, data.result.projectName, data.result);
           renderProjects();
           showToast(`¡Latido exitoso! (${data.result.latencyMs} ms · HTTP ${data.result.httpStatus})`, 'success');
         } else {
@@ -611,7 +625,7 @@
         const data = await res.json();
         if (res.ok && data.results) {
           data.results.forEach(r => {
-            saveStoredPing(r.projectId, r);
+            saveStoredPing(r.projectId, r.projectName, r);
           });
           renderProjects();
           showToast(`¡Latidos completados! ${data.summary.success} bases de datos verificadas.`, 'success');
