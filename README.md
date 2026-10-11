@@ -114,10 +114,19 @@ Desde el dashboard podrás:
 
 ---
 
-## 📘 Documentación Explicativa Técnica
+## ⚡ Versión Lite (Solo Mantenedor sin Artículos ni Guías)
 
-Para consultar una explicación más detallada sobre la integración con la API de GitHub, estrategias de ping, códigos HTTP y arquitectura técnica:
-👉 Consulta el archivo **[DOCUMENTACION.md](file:///c:/PROYECTS/MantenedorSupabase/DOCUMENTACION.md)**.
+Si deseas clonar o desplegar este proyecto únicamente como herramienta de trabajo (para tu empresa, clientes o uso personal) **sin la guía didáctica ni textos personales**:
+
+1. **Ruta lista para usar:** Accede directamente a `/lite.html` (ej: `https://tudominio.vercel.app/lite.html`).
+2. **Convertir en portada por defecto:** En tu repositorio clonado, renombra `public/lite.html` a `public/index.html`.
+3. **Uso 100% headless / sin web:** Solo necesitas GitHub Actions (`.github/workflows/supabase-keeper.yml`) y el secreto `SUPABASE_PROJECTS`. Se ejecutará automáticamente cada 12 horas sin necesidad de desplegar ninguna web.
+
+---
+
+## 📘 Documentación Oficial de Supabase
+- Política oficial de suspensiones por inactividad: [https://supabase.com/docs/guides/platform/pausing](https://supabase.com/docs/guides/platform/pausing)
+- Documentación técnica interna: Consulta **[DOCUMENTACION.md](file:///c:/PROYECTS/MantenedorSupabase/DOCUMENTACION.md)**.
 
 ---
 
@@ -127,21 +136,29 @@ Para consultar una explicación más detallada sobre la integración con la API 
 MantenedorSupabase/
 ├── .github/
 │   └── workflows/
-│       └── supabase-keeper.yml   # Automatización diaria en GitHub Actions
+│       └── supabase-keeper.yml   # Automatización autónoma en GitHub Actions (cron: 0 */12 * * *)
 ├── data/
 │   ├── projects.json             # Almacenamiento local de proyectos (protegido en Git)
 │   └── logs.json                 # Historial local de pings (protegido en Git)
 ├── lib/
-│   └── keeper.js                 # Lógica principal de peticiones y registro de logs
+│   └── keeper.js                 # Lógica de peticiones HTTP, enmascaramiento y latidos
 ├── public/
-│   └── index.html                # Dashboard Web SPA (TailwindCSS + Lucide Icons + GitHub Sync)
+│   ├── components/               # Arquitectura modular de componentes
+│   │   ├── header.js             # Barra de navegación fija y controles globales
+│   │   ├── hero.js               # Cabecera centrada con degradado verde neon a violeta
+│   │   ├── manual.js             # Manual técnico editorial y guía paso a paso
+│   │   ├── showcase.js           # Monitor de proyectos en vivo con latencias
+│   │   ├── cloud.js              # Auditoría en vivo de GitHub Actions API
+│   │   └── footer.js             # Pie con enlaces al autor y docs oficiales
+│   ├── index.html                # Aplicación completa con manual y monitor
+│   └── lite.html                 # Versión Lite independiente (solo mantenedor)
 ├── scripts/
-│   └── ping.js                   # Script ejecutable CLI con diagnóstico local y de Nube
+│   └── ping.js                   # Script CLI para ejecución local manual o cron
 ├── .env.example                  # Plantilla de variables de entorno
 ├── DOCUMENTACION.md              # Documentación técnica detallada
-├── README.md                     # Guía de inicio rápido y configuración paso a paso
-├── package.json                  # Configuración de dependencias y scripts npm
-└── server.js                     # Servidor Express, API REST & Integración GitHub Actions
+├── README.md                     # Guía de inicio rápido y configuración
+├── package.json                  # Dependencias y scripts
+└── server.js                     # Servidor Express y endpoints API REST
 ```
 
 ---

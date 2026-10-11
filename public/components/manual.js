@@ -274,6 +274,57 @@ function renderManual(containerId) {
         </div>
       </section>
 
+      <!-- CAPÍTULO 6 -->
+      <section class="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-10">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-violet-500/10 text-violet-700 dark:text-violet-400 border border-violet-500/30">CAPÍTULO 06</span>
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Versión Lite: Cómo Clonar Solo el Mantenedor (Sin la Guía ni Textos)
+          </h3>
+        </div>
+
+        <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+          Si vas a clonar o hacer fork de este repositorio para gestionar tus propias bases de datos (o para entregárselo a tu equipo o clientes) y <strong>no quieres incluir mi manual técnico ni mis explicaciones personales</strong>, el repositorio ya incluye una <strong>versión Lite limpia y minimalista</strong>.
+        </p>
+
+        <div class="p-4 rounded-xl border-l-4 border-violet-500 bg-violet-500/5 dark:bg-violet-500/10 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-mono flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <strong>Archivo listo para usar:</strong> <code>public/lite.html</code>
+            <p class="text-slate-600 dark:text-slate-400 font-sans mt-0.5">Contiene únicamente las tarjetas de monitoreo en tiempo real, latencias, latidos masivos y auditoría de GitHub Actions.</p>
+          </div>
+          <a href="/lite.html" class="px-3.5 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-sans text-xs font-semibold whitespace-nowrap shadow-sm transition-colors">
+            Probar Versión Lite ↗
+          </a>
+        </div>
+
+        <div class="space-y-3 pt-2 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+          <h4 class="font-bold text-slate-900 dark:text-white">Formas de desplegar la Versión Lite en tu proyecto:</h4>
+          
+          <div class="space-y-3">
+            <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-1">
+              <span class="font-mono text-xs font-bold text-violet-600 dark:text-violet-400 uppercase">Opción 1: Acceso Directo por URL</span>
+              <p class="text-xs sm:text-sm">
+                En tu despliegue de Vercel, simplemente accede a la ruta <code>https://tudominio.vercel.app/lite.html</code>. El backend y los pings funcionan de forma idéntica sin mostrar ningún texto didáctico.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-1">
+              <span class="font-mono text-xs font-bold text-violet-600 dark:text-violet-400 uppercase">Opción 2: Convertirla en tu Portada Principal</span>
+              <p class="text-xs sm:text-sm">
+                En tu propio repositorio, elimina o renombra el archivo <code>public/index.html</code> y renombra <code>public/lite.html</code> a <code>public/index.html</code>. Así, la raíz de tu dominio abrirá directamente el mantenedor limpio.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-1">
+              <span class="font-mono text-xs font-bold text-violet-600 dark:text-violet-400 uppercase">Opción 3: Uso Exclusivo en Segundo Plano (Sin Web)</span>
+              <p class="text-xs sm:text-sm">
+                Si no deseas ninguna web pública, no necesitas desplegar Vercel. Simplemente configura el secreto <code>SUPABASE_PROJECTS</code> en GitHub Actions. La acción se ejecutará sola cada 12 horas en la nube sin ninguna interfaz visible.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </article>
   `;
 }
