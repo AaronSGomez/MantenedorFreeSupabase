@@ -293,8 +293,12 @@ if (cron.validate(CRON_SCHEDULE)) {
 // ----------------------------------------------------
 // SERVER LAUNCH
 // ----------------------------------------------------
-app.listen(PORT, () => {
-  console.log(`==================================================`);
-  console.log(`🚀 Mantenedor Supabase corriendo en http://localhost:${PORT}`);
-  console.log(`==================================================`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`==================================================`);
+    console.log(`🚀 Mantenedor Supabase corriendo en http://localhost:${PORT}`);
+    console.log(`==================================================`);
+  });
+}
+
+module.exports = app;
