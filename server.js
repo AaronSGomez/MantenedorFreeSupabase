@@ -368,6 +368,11 @@ app.delete('/api/logs', (req, res) => {
   res.json({ message: 'Historial de logs limpiado.' });
 });
 
+// Serve Lite Standalone App
+app.get(['/lite', '/lite.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'lite.html'));
+});
+
 // Serve frontend SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

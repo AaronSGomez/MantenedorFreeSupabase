@@ -81,13 +81,13 @@
         </a>
 
         <!-- Botón Modo Claro/Oscuro -->
-        <button onclick="toggleTheme()" class="p-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 transition-all">
+        <button onclick="toggleTheme()" class="p-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 transition-all" title="Cambiar tema">
           <svg id="theme-sun-icon" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           <svg id="theme-moon-icon" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
         </button>
 
         <!-- Botón Latido Todos -->
-        <button onclick="pingAllProjects()" id="btn-ping-all" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase font-mono tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5">
+        <button onclick="pingAllProjects()" id="btn-ping-all" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase font-mono tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95">
           <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           <span id="btn-ping-all-text">Latido a Todos</span>
         </button>
@@ -104,7 +104,7 @@
           <span>Panel de Monitoreo & Latidos</span>
           <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-semibold">24/7 Keep-Alive</span>
         </h1>
-        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">Versión independiente sin artículos para clonar y utilizar en tus propios proyectos.</p>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">Versión ligera del mantenedor para operar tus proyectos en Vercel y GitHub Actions.</p>
       </div>
 
       <div class="flex items-center gap-3 font-mono text-xs">
@@ -112,7 +112,7 @@
           Cron: <span class="text-emerald-600 dark:text-emerald-400 font-bold">Cada 12h</span>
         </div>
         <button onclick="toggleConfigHelp()" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-emerald-500 transition-colors">
-          ⚙️ Configuración JSON
+          ⚙️ Variable SUPABASE_PROJECTS
         </button>
       </div>
     </div>
@@ -126,7 +126,7 @@
         <button onclick="toggleConfigHelp()" class="text-xs text-slate-400 hover:text-slate-200">Cerrar ✕</button>
       </div>
       <p class="text-xs text-slate-600 dark:text-slate-400">
-        Configura esta variable en las <strong>Environment Variables</strong> de Vercel o en los <strong>Secrets</strong> de GitHub Actions:
+        Si clonas este repositorio, configura esta variable en las <strong>Environment Variables</strong> de Vercel o en los <strong>Secrets</strong> de GitHub Actions con tu propio JSON:
       </p>
       <pre class="p-3 rounded-xl bg-slate-900 text-emerald-300 text-xs font-mono overflow-x-auto border border-slate-800"><code>[
   {
@@ -146,10 +146,10 @@
     <section class="space-y-4">
       <div class="flex items-center justify-between">
         <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span>Tus Bases de Datos Supabase</span>
-          <span id="lite-count" class="text-xs font-mono text-slate-500"></span>
+          <span>Bases de Datos Protegidas</span>
+          <span id="lite-count" class="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold"></span>
         </h2>
-        <span class="text-xs text-slate-500 font-mono">Latidos registrados localmente</span>
+        <span class="text-xs text-slate-500 font-mono">Latidos en tiempo real</span>
       </div>
 
       <div id="component-showcase"></div>
@@ -167,9 +167,9 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p>Supalive Lite Engine · Mantenedor de bases de datos Supabase.</p>
       <div class="flex items-center gap-3">
-        <a href="https://supabase.com/docs/guides/platform/pausing" target="_blank" class="hover:text-cyan-400 transition-colors">Docs Supabase Pausing ↗</a>
+        <a href="https://supabase.com/docs/guides/platform/pausing" target="_blank" class="hover:text-cyan-400 transition-colors">Docs Oficiales Supabase Pausing ↗</a>
         <span>•</span>
-        <a href="/" class="hover:text-emerald-400 transition-colors">Volver a la Guía Técnica</a>
+        <a href="/" class="hover:text-emerald-400 transition-colors">Ver Guía y Manual Completo</a>
       </div>
     </div>
   </footer>
@@ -224,7 +224,10 @@
 
     function saveStoredPing(projectId, projectName, pingData) {
       const pings = getStoredPings();
-      const data = { ...pingData, timestamp: pingData.timestamp || new Date().toISOString() };
+      const data = {
+        ...pingData,
+        timestamp: pingData.timestamp || new Date().toISOString()
+      };
       if (projectId) pings[projectId] = data;
       if (projectName) {
         const key = 'name_' + projectName.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
@@ -242,64 +245,60 @@
     async function fetchProjects() {
       try {
         const res = await fetch('/api/projects');
-        const data = await res.json();
-        stateProjects = data.projects || [];
-        renderShowcaseComponent();
+        if (res.ok) {
+          stateProjects = await res.json();
+          renderShowcaseComponent();
+        } else {
+          showToast('Error cargando proyectos', 'error');
+        }
       } catch (err) {
-        showToast('Error cargando proyectos', 'error');
+        showToast('Error de red al cargar proyectos', 'error');
       }
     }
 
-    async function pingProject(id, btnElement) {
-      const originalText = btnElement ? btnElement.innerHTML : '';
-      if (btnElement) {
-        btnElement.disabled = true;
-        btnElement.innerHTML = `<span class="animate-spin inline-block mr-1">↻</span> Enviando...`;
+    async function pingSingleProject(id, buttonEl) {
+      if (buttonEl) {
+        buttonEl.disabled = true;
+        buttonEl.innerHTML = `<span class="animate-spin inline-block mr-1">↻</span> Enviando...`;
       }
+      showToast('Enviando latido a Supabase...', 'info');
       try {
-        const res = await fetch(\`/api/projects/\${id}/ping\`, { method: 'POST' });
-        const result = await res.json();
-        if (res.ok && result.success) {
-          saveStoredPing(result.project?.id || id, result.project?.name, {
-            latencyMs: result.latencyMs,
-            httpStatus: result.httpStatus || 200,
-            target: result.target,
-            timestamp: result.timestamp || new Date().toISOString()
-          });
-          showToast(\`Latido exitoso: \${result.project?.name || id} (\${result.latencyMs} ms)\`, 'success');
+        const res = await fetch('/api/projects/' + id + '/ping', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.result) {
+          saveStoredPing(id, data.result.projectName, data.result);
           renderShowcaseComponent();
+          showToast('¡Latido exitoso! (' + data.result.latencyMs + ' ms · HTTP ' + data.result.httpStatus + ')', 'success');
         } else {
-          showToast(\`Fallo en latido: \${result.error || 'Error'}\`, 'error');
+          showToast(data.error || 'Error al enviar latido', 'error');
         }
       } catch (err) {
-        showToast('Error de red al enviar latido', 'error');
+        showToast('Error de red al conectar con Supabase', 'error');
       } finally {
-        if (btnElement) {
-          btnElement.disabled = false;
-          btnElement.innerHTML = originalText;
-        }
+        if (buttonEl) buttonEl.disabled = false;
       }
     }
+    window.pingSingleProject = pingSingleProject;
+    window.pingProject = pingSingleProject;
 
     async function pingAllProjects() {
       const btn = document.getElementById('btn-ping-all');
       const text = document.getElementById('btn-ping-all-text');
       if (btn) btn.disabled = true;
       if (text) text.textContent = 'Enviando...';
+      showToast('Enviando latido a todas las bases de datos...', 'info');
       try {
-        const res = await fetch('/api/keeper/ping-all', { method: 'POST' });
-        const result = await res.json();
-        if (result.results && result.results.length > 0) {
-          result.results.forEach(r => {
-            saveStoredPing(r.id, r.name, {
-              latencyMs: r.latencyMs,
-              httpStatus: r.httpStatus || 200,
-              target: r.target,
-              timestamp: r.timestamp || new Date().toISOString()
-            });
+        const res = await fetch('/api/ping-all', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.results) {
+          data.results.forEach(r => {
+            saveStoredPing(r.projectId, r.projectName, r);
           });
-          showToast(\`Latido enviado a \${result.results.length} bases de datos\`, 'success');
           renderShowcaseComponent();
+          const count = data.summary ? data.summary.success : data.results.length;
+          showToast('¡Latidos completados! ' + count + ' bases verificadas.', 'success');
+        } else {
+          showToast(data.error || 'Error durante el latido masivo', 'error');
         }
       } catch (err) {
         showToast('Error al enviar latido masivo', 'error');
@@ -319,7 +318,8 @@
       }
     }
 
-    function showToast(message, type = 'info') {
+    function showToast(message, type) {
+      type = type || 'info';
       const container = document.getElementById('toast-container');
       if (!container) return;
       const toast = document.createElement('div');
@@ -328,13 +328,13 @@
         error: 'bg-rose-950/90 text-rose-200 border-rose-500/40',
         info: 'bg-slate-900/90 text-slate-200 border-slate-700'
       };
-      toast.className = \`pointer-events-auto px-4 py-3 rounded-2xl border text-xs font-mono font-medium shadow-2xl backdrop-blur-xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 \${colors[type] || colors.info}\`;
-      toast.innerHTML = \`<span>\${escapeHtml(message)}</span>\`;
+      toast.className = 'pointer-events-auto px-4 py-3 rounded-2xl border text-xs font-mono font-medium shadow-2xl backdrop-blur-xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 ' + (colors[type] || colors.info);
+      toast.innerHTML = '<span>' + escapeHtml(message) + '</span>';
       container.appendChild(toast);
-      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
-      setTimeout(() => {
+      setTimeout(function() { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+      setTimeout(function() {
         toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
+        setTimeout(function() { toast.remove(); }, 300);
       }, 4000);
     }
 
@@ -342,7 +342,7 @@
       return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', function() {
       initTheme();
       renderCloud('component-cloud', null);
       fetchProjects();
