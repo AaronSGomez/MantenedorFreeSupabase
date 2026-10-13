@@ -10,19 +10,27 @@ function renderHeader(containerId) {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
         
         <!-- Logo & Titular Técnico -->
-        <div class="flex items-center space-x-3 min-w-0">
+        <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
           <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center text-emerald-400 shadow-sm shrink-0">
             <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
           </div>
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5 sm:gap-2">
-              <span class="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-white">Supalive</span>
+          <div class="min-w-0 flex flex-col justify-center">
+            <div class="flex items-center gap-2">
+              <span class="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-white leading-tight">Supalive</span>
               <span class="hidden sm:inline text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold shrink-0">Manual & Keep-Alive</span>
-              <span class="sm:hidden text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold shrink-0">Free</span>
             </div>
-            <p class="hidden sm:block text-xs text-slate-400 font-mono truncate">Manual técnico y mantenedor autónomo de bases de datos Supabase</p>
+            
+            <!-- Badge 'Free' estéticamente colocado debajo de Supalive en móvil -->
+            <div class="sm:hidden mt-0.5 flex items-center">
+              <span class="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold tracking-wider leading-none flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-glow"></span>
+                <span>Free</span>
+              </span>
+            </div>
+
+            <p class="hidden sm:block text-xs text-slate-400 font-mono truncate mt-0.5">Manual técnico y mantenedor autónomo de bases de datos Supabase</p>
           </div>
         </div>
 
