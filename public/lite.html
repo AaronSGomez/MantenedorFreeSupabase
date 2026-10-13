@@ -1,10 +1,25 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Supalive Lite · Mantenedor Autónomo de Supabase</title>
   <meta name="description" content="Versión ligera y sin artículos del mantenedor de Supabase para clonar y utilizar de forma independiente.">
+  
+  <!-- Detección automática en DOM del estilo del navegador (claro / oscuro) -->
+  <script>
+    try {
+      const savedTheme = localStorage.getItem('supalive_theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {}
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -237,10 +252,28 @@
     const STORAGE_KEY_THEME = 'supalive_theme';
 
     function initTheme() {
-      const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'dark';
-      if (savedTheme === 'light') document.documentElement.classList.remove('dark');
-      else document.documentElement.classList.add('dark');
+      const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+      let isDark = true;
+      if (savedTheme) {
+        isDark = savedTheme === 'dark';
+      } else if (window.matchMedia) {
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+
+      if (isDark) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
       updateThemeIcons();
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+          if (!localStorage.getItem(STORAGE_KEY_THEME)) {
+            if (e.matches) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            updateThemeIcons();
+            renderShowcaseComponent();
+          }
+        });
+      }
     }
 
     function toggleTheme() {

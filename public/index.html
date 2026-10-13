@@ -1,10 +1,25 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Supalive · Manual Técnico & Mantenedor Autónomo de Supabase</title>
   <meta name="description" content="Manual de ingeniería y mantenedor para operar en la capa gratuita de Supabase sin suspensiones por inactividad.">
+  
+  <!-- Detección automática en DOM del estilo del navegador (claro / oscuro) -->
+  <script>
+    try {
+      const savedTheme = localStorage.getItem('supalive_theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {}
+  </script>
+
   <!-- Google Fonts: JetBrains Mono & Plus Jakarta Sans & Syne -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,8 +133,8 @@
   <!-- Pestañas de Navegación -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-1 w-full space-y-6 sm:space-y-8">
     
-    <!-- Barra de Pestañas Segmentada & Responsiva (Diseñada para visualización perfecta en móviles y pantallas grandes) -->
-    <nav aria-label="Navegación de Secciones" class="w-full">
+    <!-- Barra de Pestañas Superior Segmentada & Responsiva -->
+    <nav aria-label="Navegación de Secciones Superior" id="tabs-navigation-top" class="w-full">
       <div class="grid grid-cols-3 gap-1 p-1 sm:p-1.5 bg-slate-200/80 dark:bg-slate-900/90 rounded-2xl border border-slate-300/60 dark:border-slate-800 shadow-sm w-full max-w-3xl mx-auto sm:mx-0">
         
         <button onclick="switchTab('manual')" id="tab-btn-manual" class="py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/60 dark:border-slate-700/60 shrink-0">
@@ -158,6 +173,47 @@
       <div id="component-cloud"></div>
     </div>
 
+    <!-- Barra de Pestañas Inferior (Navegación Rápida) -->
+    <div class="pt-8 sm:pt-10 border-t border-slate-200/80 dark:border-slate-800/80 space-y-3">
+      
+      <!-- Mensaje avisando solicitado por el usuario -->
+      <div class="flex items-center justify-between flex-wrap gap-2 text-xs font-mono">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-glow shrink-0"></span>
+          <span class="font-bold text-slate-800 dark:text-slate-200">Para que no tengas que volver a subir:</span>
+          <span class="text-slate-500 dark:text-slate-400">continúa a la siguiente pestaña desde aquí</span>
+        </div>
+        <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+          <span>↑ Acceso rápido</span>
+        </span>
+      </div>
+
+      <!-- Botones de Pestañas Inferiores -->
+      <nav aria-label="Navegación de Secciones Inferior" class="w-full">
+        <div class="grid grid-cols-3 gap-1 p-1 sm:p-1.5 bg-slate-200/80 dark:bg-slate-900/90 rounded-2xl border border-slate-300/60 dark:border-slate-800 shadow-sm w-full max-w-3xl mx-auto sm:mx-0">
+          
+          <button onclick="switchTab('manual', true)" id="tab-btn-bottom-manual" class="py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+            <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span class="sm:hidden">Manual</span>
+            <span class="hidden sm:inline">Manual Técnico & Guía</span>
+          </button>
+
+          <button onclick="switchTab('showcase', true)" id="tab-btn-bottom-showcase" class="py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-slate-800/40 border border-transparent shrink-0">
+            <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <span class="sm:hidden">Monitor</span>
+            <span class="hidden sm:inline">Monitor en Vivo</span>
+          </button>
+
+          <button onclick="switchTab('cloud', true)" id="tab-btn-bottom-cloud" class="py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-slate-800/40 border border-transparent shrink-0">
+            <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+            <span class="sm:hidden">Auditoría</span>
+            <span class="hidden sm:inline">Auditoría Cloud (GitHub)</span>
+          </button>
+
+        </div>
+      </nav>
+    </div>
+
   </main>
 
   <!-- Footer Component (Fijo en Modo Oscuro) -->
@@ -173,15 +229,38 @@
     const STORAGE_KEY_PINGS = 'supalive_last_pings';
     const STORAGE_KEY_THEME = 'supalive_theme';
 
-    // Theme Management
+    // Theme Management con detección del estilo del navegador
     function initTheme() {
-      const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'dark';
-      if (savedTheme === 'light') {
-        document.documentElement.classList.remove('dark');
-      } else {
+      const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+      let isDark = true;
+      if (savedTheme) {
+        isDark = savedTheme === 'dark';
+      } else if (window.matchMedia) {
+        // Detecta el estilo del navegador por defecto: si usa claro, claro; si no, oscuro
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+
+      if (isDark) {
         document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
       }
       updateThemeIcons();
+
+      // Escuchar cambios de preferencia del sistema si el usuario no ha forzado un tema manualmente
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+          if (!localStorage.getItem(STORAGE_KEY_THEME)) {
+            if (e.matches) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+            updateThemeIcons();
+            renderShowcaseComponent();
+          }
+        });
+      }
     }
 
     function toggleTheme() {
@@ -236,32 +315,51 @@
       localStorage.setItem(STORAGE_KEY_PINGS, JSON.stringify(pings));
     }
 
-    // Control de pestañas responsivo
-    function switchTab(tabId) {
+    // Control de pestañas sincronizado (superior e inferior)
+    function switchTab(tabId, scrollUp = false) {
       const activeClass = 'py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/60 dark:border-slate-700/60 shrink-0';
       const inactiveClass = 'py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-slate-800/40 border border-transparent shrink-0';
 
       ['manual', 'showcase', 'cloud'].forEach(t => {
         const content = document.getElementById(`tab-${t}`);
-        const btn = document.getElementById(`tab-btn-${t}`);
-        const icon = btn ? btn.querySelector('svg') : null;
+        const btnTop = document.getElementById(`tab-btn-${t}`);
+        const btnBottom = document.getElementById(`tab-btn-bottom-${t}`);
+
+        const updateBtn = (btn, isActive) => {
+          if (!btn) return;
+          const icon = btn.querySelector('svg');
+          if (isActive) {
+            btn.className = activeClass;
+            if (icon) {
+              icon.classList.remove('text-slate-400', 'dark:text-slate-500');
+              icon.classList.add('text-emerald-500');
+            }
+          } else {
+            btn.className = inactiveClass;
+            if (icon) {
+              icon.classList.remove('text-emerald-500');
+              icon.classList.add('text-slate-400', 'dark:text-slate-500');
+            }
+          }
+        };
 
         if (t === tabId) {
-          content.classList.remove('hidden');
-          btn.className = activeClass;
-          if (icon) {
-            icon.classList.remove('text-slate-400', 'dark:text-slate-500');
-            icon.classList.add('text-emerald-500');
-          }
+          if (content) content.classList.remove('hidden');
+          updateBtn(btnTop, true);
+          updateBtn(btnBottom, true);
         } else {
-          content.classList.add('hidden');
-          btn.className = inactiveClass;
-          if (icon) {
-            icon.classList.remove('text-emerald-500');
-            icon.classList.add('text-slate-400', 'dark:text-slate-500');
-          }
+          if (content) content.classList.add('hidden');
+          updateBtn(btnTop, false);
+          updateBtn(btnBottom, false);
         }
       });
+
+      if (scrollUp) {
+        const topNav = document.getElementById('tabs-navigation-top');
+        if (topNav) {
+          topNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     }
 
     // Utilidad de copiado al portapapeles para bloques de código
