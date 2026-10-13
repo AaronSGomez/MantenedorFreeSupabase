@@ -17,9 +17,10 @@ function renderHeader(containerId) {
             </svg>
           </div>
           <div class="min-w-0">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 sm:gap-2">
               <span class="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-white">Supalive</span>
-              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold shrink-0">Manual & Keep-Alive</span>
+              <span class="hidden sm:inline text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold shrink-0">Manual & Keep-Alive</span>
+              <span class="sm:hidden text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold shrink-0">Free</span>
             </div>
             <p class="hidden sm:block text-xs text-slate-400 font-mono truncate">Manual técnico y mantenedor autónomo de bases de datos Supabase</p>
           </div>

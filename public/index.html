@@ -46,6 +46,10 @@
     }
   </script>
   <style>
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
     .neon-text {
       background: linear-gradient(135deg, #10b981 0%, #00f59b 50%, #06b6d4 100%);
       -webkit-background-clip: text;
@@ -62,6 +66,37 @@
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Scrollbars visuales táctiles para tablas y bloques de código */
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.1);
+      border-radius: 9999px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(16, 185, 129, 0.4);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(16, 185, 129, 0.75);
+    }
+    .table-scroll-container {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+    }
+    code:not(pre code) {
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+    pre {
+      max-width: 100%;
+    }
   </style>
 
   <!-- Componentes Modulares -->
@@ -83,24 +118,30 @@
   <!-- Pestañas de Navegación -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-1 w-full space-y-6 sm:space-y-8">
     
-    <!-- Barra de Pestañas (Scroll táctil en móvil) -->
-    <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0">
-      
-      <button onclick="switchTab('manual')" id="tab-btn-manual" class="px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 flex items-center gap-2 transition-all shrink-0">
-        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        <span>Manual Técnico & Guía Paso a Paso</span>
-      </button>
+    <!-- Barra de Pestañas Segmentada & Responsiva (Diseñada para visualización perfecta en móviles y pantallas grandes) -->
+    <nav aria-label="Navegación de Secciones" class="w-full">
+      <div class="grid grid-cols-3 gap-1 p-1 sm:p-1.5 bg-slate-200/80 dark:bg-slate-900/90 rounded-2xl border border-slate-300/60 dark:border-slate-800 shadow-sm w-full max-w-3xl mx-auto sm:mx-0">
+        
+        <button onclick="switchTab('manual')" id="tab-btn-manual" class="py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+          <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span class="sm:hidden">Manual</span>
+          <span class="hidden sm:inline">Manual Técnico & Guía</span>
+        </button>
 
-      <button onclick="switchTab('showcase')" id="tab-btn-showcase" class="px-4 sm:px-5 py-3 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all shrink-0">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-        <span>Monitor en Vivo (Prueba Real)</span>
-      </button>
+        <button onclick="switchTab('showcase')" id="tab-btn-showcase" class="py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-slate-800/40 border border-transparent shrink-0">
+          <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          <span class="sm:hidden">Monitor</span>
+          <span class="hidden sm:inline">Monitor en Vivo</span>
+        </button>
 
-      <button onclick="switchTab('cloud')" id="tab-btn-cloud" class="px-4 sm:px-5 py-3 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all shrink-0">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
-        <span>Auditoría Cloud (GitHub Actions)</span>
-      </button>
-    </div>
+        <button onclick="switchTab('cloud')" id="tab-btn-cloud" class="py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-slate-800/40 border border-transparent shrink-0">
+          <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+          <span class="sm:hidden">Auditoría</span>
+          <span class="hidden sm:inline">Auditoría Cloud (GitHub)</span>
+        </button>
+
+      </div>
+    </nav>
 
     <!-- Pestaña 1: Manual Técnico -->
     <div id="tab-manual">
@@ -195,18 +236,48 @@
       localStorage.setItem(STORAGE_KEY_PINGS, JSON.stringify(pings));
     }
 
-    // Control de pestañas
+    // Control de pestañas responsivo
     function switchTab(tabId) {
+      const activeClass = 'py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/60 dark:border-slate-700/60 shrink-0';
+      const inactiveClass = 'py-2.5 px-2 sm:px-5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-slate-800/40 border border-transparent shrink-0';
+
       ['manual', 'showcase', 'cloud'].forEach(t => {
         const content = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`tab-btn-${t}`);
+        const icon = btn ? btn.querySelector('svg') : null;
+
         if (t === tabId) {
           content.classList.remove('hidden');
-          btn.className = 'px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 flex items-center gap-2 transition-all shrink-0';
+          btn.className = activeClass;
+          if (icon) {
+            icon.classList.remove('text-slate-400', 'dark:text-slate-500');
+            icon.classList.add('text-emerald-500');
+          }
         } else {
           content.classList.add('hidden');
-          btn.className = 'px-4 sm:px-5 py-3 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 transition-all shrink-0';
+          btn.className = inactiveClass;
+          if (icon) {
+            icon.classList.remove('text-emerald-500');
+            icon.classList.add('text-slate-400', 'dark:text-slate-500');
+          }
         }
+      });
+    }
+
+    // Utilidad de copiado al portapapeles para bloques de código
+    function copyCode(buttonEl, codeId) {
+      const codeEl = document.getElementById(codeId);
+      if (!codeEl) return;
+      const textToCopy = codeEl.innerText.trim();
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalContent = buttonEl.innerHTML;
+        buttonEl.innerHTML = `<span class="text-emerald-400 font-bold">¡Copiado! ✓</span>`;
+        showToast('Código copiado al portapapeles', 'success');
+        setTimeout(() => {
+          buttonEl.innerHTML = originalContent;
+        }, 2200);
+      }).catch(() => {
+        showToast('No se pudo copiar automáticamente', 'error');
       });
     }
 

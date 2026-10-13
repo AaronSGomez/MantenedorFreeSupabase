@@ -52,25 +52,58 @@ function renderCloud(containerId, cloudState) {
       </div>
 
       <div class="rounded-2xl border border-slate-200 bg-white dark:border-slate-800/80 dark:bg-slate-900/50 overflow-hidden shadow-soft-card dark:shadow-none">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-mono text-slate-700 dark:text-slate-300 min-w-[560px]">
-            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 dark:bg-slate-950/60 dark:text-slate-400 dark:border-slate-800 uppercase text-[10px] tracking-wider">
-              <tr>
-                <th class="px-4 py-3">Flujo de Trabajo</th>
-                <th class="px-4 py-3">Disparador</th>
-                <th class="px-4 py-3">Estado</th>
-                <th class="px-4 py-3">Resultado</th>
-                <th class="px-4 py-3">Fecha y Hora</th>
-                <th class="px-4 py-3 text-right">Verificación</th>
-              </tr>
-            </thead>
-            <tbody id="cloud-tbody" class="divide-y divide-slate-100 dark:divide-slate-800/60">
-              ${rowsHtml}
-            </tbody>
-          </table>
+        
+        <!-- Aviso de Scroll Horizontal en Móvil -->
+        <div class="sm:hidden flex items-center justify-between px-3.5 py-2.5 bg-emerald-500/10 dark:bg-emerald-500/15 border-b border-emerald-500/20 text-[11px] font-mono text-emerald-800 dark:text-emerald-300">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 animate-pulse shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            <span class="font-medium">Desliza la tabla para ver todas las columnas</span>
+          </div>
+          <span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 shrink-0">
+            ↔ Scroll
+          </span>
         </div>
+
+        <div class="relative w-full max-w-full">
+          <div class="overflow-x-auto custom-scrollbar table-scroll-container w-full" id="cloud-scroll-container" onscroll="handleTableScroll(this)">
+            <table class="w-full text-left text-xs font-mono text-slate-700 dark:text-slate-300 min-w-[640px]">
+              <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 dark:bg-slate-950/60 dark:text-slate-400 dark:border-slate-800 uppercase text-[10px] tracking-wider whitespace-nowrap">
+                <tr>
+                  <th class="px-4 py-3">Flujo de Trabajo</th>
+                  <th class="px-4 py-3">Disparador</th>
+                  <th class="px-4 py-3">Estado</th>
+                  <th class="px-4 py-3">Resultado</th>
+                  <th class="px-4 py-3">Fecha y Hora</th>
+                  <th class="px-4 py-3 text-right">Verificación</th>
+                </tr>
+              </thead>
+              <tbody id="cloud-tbody" class="divide-y divide-slate-100 dark:divide-slate-800/60 whitespace-nowrap">
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Indicador visual de degradado lateral derecho para dispositivos táctiles -->
+          <div id="cloud-scroll-shadow" class="pointer-events-none absolute top-0 bottom-0 right-0 w-10 bg-gradient-to-l from-slate-200/80 dark:from-slate-900/95 to-transparent sm:hidden transition-opacity duration-300 flex items-center justify-end pr-1">
+            <svg class="w-4 h-4 text-emerald-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+
+        <!-- Barra inferior indicadora de navegación táctil en móvil -->
+        <div class="sm:hidden px-3.5 py-2 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-200 dark:border-slate-800 text-[10px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between">
+          <span>← Arrastra horizontalmente para ver registros →</span>
+          <span class="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">6 columnas</span>
+        </div>
+
       </div>
 
     </div>
   `;
+}
+
+function handleTableScroll(el) {
+  const shadow = document.getElementById('cloud-scroll-shadow');
+  if (!shadow) return;
+  const isEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 12;
+  shadow.style.opacity = isEnd ? '0' : '1';
 }
