@@ -119,29 +119,30 @@
           </div>
           <div>
             <div class="flex items-center gap-1.5">
-              <span class="font-display font-extrabold text-lg tracking-tight text-white">Supalive</span>
-              <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">LITE</span>
+              <span class="font-display font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">Supalive</span>
+              <span class="text-[9px] sm:text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold shrink-0">LITE</span>
             </div>
             <p class="text-[10px] text-slate-400 font-mono hidden sm:block">Mantenedor autónomo de bases de datos</p>
           </div>
         </a>
       </div>
 
-      <div class="flex items-center space-x-2.5">
-        <a href="/" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900 text-xs font-medium text-slate-300 hover:text-white transition-all">
+      <div class="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
+        <a href="/" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-100 dark:bg-slate-900 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all">
           <span>📚 Ver Guía Completa</span>
         </a>
 
         <!-- Botón Modo Claro/Oscuro -->
-        <button onclick="toggleTheme()" class="p-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 transition-all" title="Cambiar tema">
-          <svg id="theme-sun-icon" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <button onclick="toggleTheme()" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all shrink-0" title="Cambiar tema">
+          <svg id="theme-sun-icon" class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           <svg id="theme-moon-icon" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
         </button>
 
         <!-- Botón Latido Todos -->
-        <button onclick="pingAllProjects()" id="btn-ping-all" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase font-mono tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95">
-          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span id="btn-ping-all-text">Latido a Todos</span>
+        <button onclick="pingAllProjects()" id="btn-ping-all" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase font-mono tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 shrink-0">
+          <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span class="hidden sm:inline" id="btn-ping-all-text">Latido a Todos</span>
+          <span class="sm:hidden" id="btn-ping-all-text-mobile">Latido</span>
         </button>
       </div>
 
@@ -370,8 +371,10 @@
     async function pingAllProjects() {
       const btn = document.getElementById('btn-ping-all');
       const text = document.getElementById('btn-ping-all-text');
+      const textMobile = document.getElementById('btn-ping-all-text-mobile');
       if (btn) btn.disabled = true;
       if (text) text.textContent = 'Enviando...';
+      if (textMobile) textMobile.textContent = '...';
       showToast('Enviando latido a todas las bases de datos...', 'info');
       try {
         const res = await fetch('/api/ping-all', { method: 'POST' });
@@ -391,6 +394,7 @@
       } finally {
         if (btn) btn.disabled = false;
         if (text) text.textContent = 'Latido a Todos';
+        if (textMobile) textMobile.textContent = 'Latido';
       }
     }
 

@@ -99,9 +99,12 @@ function renderShowcase(containerId, projects, storedPings) {
       <!-- Subtítulo técnico -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <h2 class="text-base sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
             <span>Bases de Datos en Monitoreo Continuo</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">SSL Encrypted</span>
+            <span class="text-[9px] sm:text-[10px] font-mono uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 whitespace-nowrap shrink-0">
+              <span class="hidden sm:inline">SSL Encrypted</span>
+              <span class="sm:hidden">SSL</span>
+            </span>
           </h2>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Demostración en vivo de los 4 proyectos protegidos. Haz clic en "Enviar Latido" para comprobar la latencia.</p>
         </div>
