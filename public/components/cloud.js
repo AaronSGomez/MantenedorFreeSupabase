@@ -38,9 +38,12 @@ function renderCloud(containerId, cloudState) {
       
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <h2 class="text-base sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
             <span>Historial en Tiempo Real de GitHub Actions</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/25">Live API</span>
+            <span class="text-[9px] sm:text-[10px] font-mono uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/25 whitespace-nowrap shrink-0">
+              <span class="hidden sm:inline">Live API</span>
+              <span class="sm:hidden">API</span>
+            </span>
           </h2>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Auditoría pública e inmutable consultada directamente desde GitHub sin base de datos externa.</p>
         </div>
