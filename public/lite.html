@@ -196,7 +196,8 @@
     "name": "Mi Base Supabase",
     "url": "https://xyzxyzxyz.supabase.co",
     "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "target": "rest"
+    "target": "table",
+    "customTable": "nombre_tabla"
   }
 ]</code></pre>
         </div>
@@ -205,6 +206,9 @@
           <span class="text-emerald-400 font-semibold">JSON</span>
         </div>
       </div>
+      <p class="text-[11px] text-amber-600 dark:text-amber-400 font-mono mt-1">
+        💡 <strong>Importante:</strong> Define siempre <code>"target": "table"</code> y <code>"customTable"</code> para ejecutar consultas reales en PostgreSQL y reiniciar la inactividad de 7 días.
+      </p>
     </div>
   </div>
 

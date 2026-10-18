@@ -257,13 +257,15 @@ function renderManual(containerId) {
     "name": "Proyecto Producción",
     "url": "https://xxxxxxxxxxxxxxxxxxxx.supabase.co",
     "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "target": "rest"
+    "target": "table",
+    "customTable": "nombre_tabla"
   },
   {
     "name": "Backend App Móvil",
     "url": "https://yyyyyyyyyyyyyyyyyyyy.supabase.co",
     "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "target": "auth"
+    "target": "table",
+    "customTable": "photos"
   }
 ]</code></pre>
           </div>
@@ -273,6 +275,18 @@ function renderManual(containerId) {
             <span class="text-emerald-400 font-semibold">JSON</span>
           </div>
 
+        </div>
+
+        <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm space-y-1.5 leading-relaxed">
+          <div class="font-bold flex items-center gap-2 text-amber-800 dark:text-amber-300">
+            <span>⚠️ Clave para evitar pausas por inactividad de Supabase:</span>
+          </div>
+          <p>
+            Supabase mide únicamente la actividad real en la base de datos <strong>PostgreSQL</strong>. Peticiones a la raíz (<code>/rest/v1/</code>) son rechazadas con HTTP 401 por Kong Gateway al usar claves públicas <code>anon</code>, y no llegan a tocar la base de datos.
+          </p>
+          <p>
+            Para garantizar que el temporizador de 7 días se reinicie, configura siempre <code>"target": "table"</code> con el nombre de una tabla real en <code>"customTable"</code> (por ejemplo: <code>"photos"</code>, <code>"projects"</code>, <code>"invitados"</code>). De este modo se ejecuta un <code>SELECT * FROM tabla LIMIT 1</code> en Postgres, registrando actividad legítima en la telemetría de Supabase.
+          </p>
         </div>
 
         <div class="space-y-2 pt-2">
