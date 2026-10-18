@@ -124,6 +124,17 @@ Puedes configurar cada proyecto con las siguientes estrategias según la natural
 | **Auth Health** | `"target": "auth"` | `https://<url>.supabase.co/auth/v1/health` | Verifica la salud del microservicio GoTrue. *Nota: No ejecuta consultas a PostgreSQL por sí misma.* |
 | **REST Root** | `"target": "rest"` | `https://<url>.supabase.co/rest/v1/` | Consulta la raíz OpenAPI. *Nota: Requiere `service_role`; con claves `anon` es bloqueada con HTTP 401 por Kong Gateway.* |
 
+### 🧭 Guía de Selección de Tablas sin Riesgos de Seguridad o Rendimiento
+
+Muchos usuarios temen que realizar consultas automáticas pueda alterar sus bases de datos o incurrir en costes:
+
+1. **Garantía de Solo Lectura**: El mantenedor utiliza exclusivamente el método HTTP `GET` con el modificador de PostgREST `?select=*&limit=1`. **No existe posibilidad física de insertar, modificar ni suprimir datos**.
+2. **Impacto de Cómputo Nulo (< 10 ms)**: PostgREST compila la petición directamente en un `SELECT ... LIMIT 1` indexado o secuencial inmediato. PostgreSQL finaliza la ejecución en pocos milisegundos y transmite una respuesta de tamaño ínfimo, manteniendo el consumo de CPU en **0.00%**.
+3. **¿Qué estrategia elegir?**
+   - **Opción 1: Catálogos o Tablas Públicas (Recomendado)**: Selecciona cualquier tabla que tu frontend ya lea habitualmente (ej. `productos`, `articulos`, `fotos`, `posts`, `proyectos`). Si tu frontend puede leerla con la anon key, responderá **HTTP 200 OK**.
+   - **Opción 2: Storage Buckets (`target: "storage"`)**: Si tu base de datos tiene **Row Level Security (RLS)** activado en todas las tablas sin permisos para usuarios anónimos, usa `storage`. Consultará `/storage/v1/bucket`, interactuando con PostgreSQL bajo el capó y devolviendo **HTTP 200 OK** sin requerir que expongas ninguna tabla.
+   - **Opción 3: Tabla de Control Dedicada (Incluso Vacía)**: Puedes crear en el SQL Editor de Supabase una tabla `keepalive` con una fila o incluso completamente vacía y asignarle `CREATE POLICY ... FOR SELECT TO anon USING (true);`. PostgREST responderá `[]` con **HTTP 200 OK**, ejecutando SQL real y manteniendo despierto el proyecto.
+
 ### Cabeceras HTTP que se envían en la petición
 ```http
 GET /rest/v1/nombre_tabla?select=*&limit=1 HTTP/1.1
@@ -192,4 +203,8 @@ Tras auditar el tráfico HTTP y las respuestas del API Gateway de Supabase, se i
    - Se eliminaron las clasificaciones laxas. Únicamente códigos de estado HTTP 2xx (200-299) marcan el ping como `SUCCESS`. Errores 401 o 404 son reportados como `FAILED`, acompañados de un mensaje orientativo para la configuración de la tabla.
 5. **Optimización de Interfaz en Dispositivos Móviles:**
    - Se rediseñaron los componentes visuales para garantizar que en pantallas de 380px no se produzcan cortes de botones ni saltos a 2 líneas en badges ("Latido", "SSL", "API"), incorporando avisos claros sobre la navegación táctil y el desplazamiento horizontal de tablas y bloques de código.
+6. **Sincronización Independiente de Entornos (GitHub Actions vs Vercel):**
+   - Se documentó formalmente que los Secrets de GitHub no se comunican con los entornos serverless de Vercel. Para el funcionamiento de los latidos manuales en la web, la variable `SUPABASE_PROJECTS` debe registrarse explícitamente en el panel de Vercel con su respectivo redeployment.
+7. **Aislamiento de Seguridad en la Web UI:**
+   - Se desacopló la verificación de la variable de entorno `CRON_SECRET` de la ruta `/api/ping-all`, restringiéndola exclusivamente a invocaciones programadas externas en `/api/cron`. Esto garantiza que los botones de la interfaz web no sufran bloqueos 401 por falta de tokens de cabecera.
 

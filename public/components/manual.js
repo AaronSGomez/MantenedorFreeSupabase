@@ -211,8 +211,11 @@ function renderManual(containerId) {
             <div class="flex items-center gap-2"><span class="text-slate-500">Variable:</span> <span class="text-cyan-600 dark:text-cyan-400 font-bold break-all">SUPABASE_PROJECTS</span></div>
             <div class="p-2.5 rounded-lg bg-white dark:bg-[#070b14] border border-slate-200 dark:border-slate-800/80 overflow-x-auto custom-scrollbar table-scroll-container">
               <span class="text-slate-500">Valor Ejemplo:</span> 
-              <span class="text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">[ { "name": "Mi Base", "url": "https://...supabase.co", "key": "..." } ]</span>
+              <span class="text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">[ { "name": "Mi Base", "url": "https://...supabase.co", "key": "...", "target": "table", "customTable": "photos" } ]</span>
             </div>
+          </div>
+          <div class="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs leading-relaxed">
+            <strong>⚠️ Recordatorio Fundamental:</strong> Vercel y GitHub son plataformas independientes. <strong>Los Secrets de GitHub NO se comunican con Vercel</strong>. Para que el botón de latido manual funcione en la web, debes registrar esta variable en Vercel y hacer un <em>Redeploy</em>.
           </div>
           <p>
             3. Haz clic en <strong>Deploy</strong>. Vercel compilará la API serverless y la interfaz web en menos de 1 minuto.<br>
@@ -285,8 +288,49 @@ function renderManual(containerId) {
             Supabase mide únicamente la actividad real en la base de datos <strong>PostgreSQL</strong>. Peticiones a la raíz (<code>/rest/v1/</code>) son rechazadas con HTTP 401 por Kong Gateway al usar claves públicas <code>anon</code>, y no llegan a tocar la base de datos.
           </p>
           <p>
-            Para garantizar que el temporizador de 7 días se reinicie, configura siempre <code>"target": "table"</code> con el nombre de una tabla real en <code>"customTable"</code> (por ejemplo: <code>"photos"</code>, <code>"projects"</code>, <code>"invitados"</code>). De este modo se ejecuta un <code>SELECT * FROM tabla LIMIT 1</code> en Postgres, registrando actividad legítima en la telemetría de Supabase.
+            Para garantizar que el temporizador de 7 días se reinicie, configura siempre <code>"target": "table"</code> con el nombre de una tabla real en <code>"customTable"</code> (por ejemplo: <code>"photos"</code>, <code>"projects"</code>, <code>"invitados"</code>), o utiliza <code>"target": "storage"</code> si prefieres consultar el catálogo de almacenamiento. De este modo se ejecuta una consulta SQL real en Postgres, registrando actividad legítima en la telemetría de Supabase.
           </p>
+        </div>
+
+        <!-- Guía de Selección sin Riesgos de Tablas -->
+        <div class="space-y-3 pt-2">
+          <h4 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>🧭</span>
+            <span>¿Cómo elegir la tabla de tu base de datos sin ningún riesgo?</span>
+          </h4>
+          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            Muchos usuarios dudan sobre si consultar una tabla puede comprometer la privacidad o el rendimiento. Supalive está diseñado bajo las siguientes premisas de ingeniería:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-1">
+              <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400">1. Solo Lectura (1 Fila)</div>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400">
+                Ejecuta estrictamente <code>?select=*&limit=1</code>. Es físicamente imposible que inserte, altere o elimine tus datos.
+              </p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-1">
+              <div class="text-xs font-bold text-cyan-600 dark:text-cyan-400">2. Consumo Nulo (&lt;10ms)</div>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400">
+                La consulta dura milisegundos y transfiere unos pocos bytes. El impacto en tu cuota gratuita de cómputo es de 0.00%.
+              </p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-1">
+              <div class="text-xs font-bold text-purple-600 dark:text-purple-400">3. Alternativa Storage</div>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400">
+                Si tus tablas tienen RLS estricto, usa <code>"target": "storage"</code>. No necesitas exponer ni una sola tabla.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-1 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+              <strong>• ¿Qué tabla elegir?</strong> Cualquier tabla que tu frontend ya lea habitualmente (ej: <code>articulos</code>, <code>fotos</code>, <code>posts</code>, <code>productos</code>, <code>proyectos</code>). Si tu frontend la lee con la clave anon, responderá <strong>HTTP 200 OK</strong>.
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+              <strong>• ¿Y si todas mis tablas son privadas?</strong> Configura <code>"target": "storage"</code>. El catálogo de almacenamiento corre sobre PostgreSQL en Supabase, resetea la inactividad y garantiza un <strong>HTTP 200 OK</strong> sin tocar tus tablas privadas.
+            </div>
+          </div>
         </div>
 
         <div class="space-y-2 pt-2">
