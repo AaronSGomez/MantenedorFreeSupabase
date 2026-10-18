@@ -12,6 +12,7 @@ Este documento describe en detalle el funcionamiento técnico, la seguridad de d
 5. [Estrategias de Ping Disponible y Cabeceras HTTP](#5-estrategias-de-ping-disponible-y-cabeceras-http)
 6. [Interpretación de Respuestas y Logs](#6-interpretación-de-respuestas-y-logs)
 7. [Resumen de Archivos y Responsabilidades](#7-resumen-de-archivos-y-responsabilidades)
+8. [Análisis Post-Mortem de Incidentes y Mejoras de Resiliencia](#8-análisis-post-mortem-de-incidentes-y-mejoras-de-resiliencia)
 
 ---
 
@@ -19,10 +20,11 @@ Este documento describe en detalle el funcionamiento técnico, la seguridad de d
 
 Supabase ofrece un plan gratuito muy generoso, pero para optimizar recursos en sus servidores en la nube, aplica una regla de inactividad:
 
-- **Regla de Inactividad de 7 Días**: Si un proyecto no recibe peticiones a su API REST, API Auth, o consultas SQL durante 7 días continuos, la instancia de base de datos PostgreSQL pasa a estado **Paused** (Pausada).
+- **Regla de Inactividad de 7 Días**: Si un proyecto no registra actividad en su base de datos **PostgreSQL** durante 7 días continuos, la plataforma pasa la instancia al estado **Paused** (Pausada).
+- **Qué cuenta como actividad real**: Supabase exige que se ejecuten consultas SQL genuinas en el motor de base de datos (por ejemplo, lecturas o escrituras a tablas vía la API PostgREST o en el catálogo de Storage). Tráfico perimetral rechazado con error 401 en el API Gateway o simples comprobaciones de contenedores satélites (como GoTrue Auth) no resetean el contador de inactividad de Postgres.
 - **Efecto de la Pausa**: Cuando el proyecto está pausado, la base de datos no responde. Al recibir una nueva petición, el usuario o la aplicación experimenta una falla o un retraso prolongado (warm-up) mientras Supabase vuelve a encender el contenedor.
 
-**Solución**: Este mantenedor realiza una petición HTTP autenticada al menos 1 vez al día (cada 24 horas), lo que **reinicia el temporizador de 7 días a cero constantemente**, garantizando que tu base de datos esté **100% activa siempre**.
+**Solución**: Este mantenedor realiza consultas HTTP autenticadas contra tablas reales de tus proyectos dos veces al día (cada 12 horas mediante cron), ejecutando un `SELECT ... LIMIT 1` que **reinicia el temporizador de 7 días a cero constantemente en PostgreSQL**, garantizando que tu base de datos esté **100% activa siempre**.
 
 ---
 
@@ -113,17 +115,18 @@ De esta forma, **puedes hacer tu repositorio público sin ningún riesgo**.
 
 ## 5. Estrategias de Ping Disponible y Cabeceras HTTP
 
-Puedes configurar cada proyecto con una de las siguientes 3 estrategias según tu preferencia:
+Puedes configurar cada proyecto con las siguientes estrategias según la naturaleza de tu base de datos:
 
 | Estrategia | Valor en JSON | URL Solicitada | Descripción |
 | :--- | :--- | :--- | :--- |
-| **REST Root (Recomendado)** | `"target": "rest"` | `https://<url>.supabase.co/rest/v1/` | Consulta la raíz de la API PostgREST. Es ultra ligera, rápida y no modifica datos. |
-| **Auth Health** | `"target": "auth"` | `https://<url>.supabase.co/auth/v1/health` | Verifica el estado del microservicio de autenticación de Supabase (GoTrue). |
-| **Consulta a Tabla** | `"target": "table"` | `https://<url>.supabase.co/rest/v1/<tabla>?select=*&limit=1` | Lee la primera fila de una tabla de tu elección (ej. `users` o `profiles`). |
+| **Consulta a Tabla (Recomendada y 100% Efectiva)** | `"target": "table"`, `"customTable": "<tabla>"` | `https://<url>.supabase.co/rest/v1/<tabla>?select=*&limit=1` | **Garantizada.** Ejecuta una consulta `SELECT` real en PostgreSQL que lee la primera fila de una tabla pública, reseteando la inactividad en Supabase. |
+| **Storage Buckets** | `"target": "storage"` | `https://<url>.supabase.co/storage/v1/bucket` | Consulta la API de almacenamiento. Ideal para proyectos donde las tablas públicas tienen RLS estricto pero se usan buckets. |
+| **Auth Health** | `"target": "auth"` | `https://<url>.supabase.co/auth/v1/health` | Verifica la salud del microservicio GoTrue. *Nota: No ejecuta consultas a PostgreSQL por sí misma.* |
+| **REST Root** | `"target": "rest"` | `https://<url>.supabase.co/rest/v1/` | Consulta la raíz OpenAPI. *Nota: Requiere `service_role`; con claves `anon` es bloqueada con HTTP 401 por Kong Gateway.* |
 
 ### Cabeceras HTTP que se envían en la petición
 ```http
-GET /rest/v1/ HTTP/1.1
+GET /rest/v1/nombre_tabla?select=*&limit=1 HTTP/1.1
 Host: tu-proyecto.supabase.co
 apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6...
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...
@@ -137,10 +140,10 @@ Accept: application/json
 
 Cuando el mantenedor realiza el ping, evalúa la respuesta HTTP de Supabase:
 
-- **HTTP 200 / 204 (OK)**: El ping fue totalmente exitoso y autenticado.
-- **HTTP 401 / 403 (Unauthorized / Forbidden)**: Ocurre si la API Key es incorrecta o no se incluyó. **Aun así, la base de datos se mantiene despierta**, porque el servidor PostgREST de Supabase procesó la solicitud HTTP para validar la autenticación.
-- **HTTP 404 (Not Found)**: Ocurre si la tabla especificada no existe, pero también confirma que el motor de Supabase respondió.
-- **Timeout / Error de Conexión**: Si pasan más de 15 segundos sin respuesta, se registra un error para que puedas revisarlo en el dashboard o en los logs de GitHub Actions.
+- **HTTP 200 / 204 (OK) ➔ SUCCESS**: El ping fue totalmente exitoso y la consulta fue procesada por PostgreSQL. **El temporizador de 7 días se reinicia**.
+- **HTTP 401 / 403 (Unauthorized / Forbidden) ➔ FAILED**: La petición fue bloqueada en el API Gateway (Kong) o la clave `anon` no tiene permisos. **PostgreSQL NO ejecutó ninguna consulta SQL**. Requiere configurar una tabla en `customTable` o revisar la clave.
+- **HTTP 404 (Not Found) ➔ FAILED**: La tabla o ruta especificada no existe en el esquema de la base de datos.
+- **Timeout / Error de Conexión ➔ FAILED**: Si pasan más de 15 segundos sin respuesta, se registra un fallo de red o tiempo de espera agotado.
 
 ---
 
@@ -152,3 +155,41 @@ Cuando el mantenedor realiza el ping, evalúa la respuesta HTTP de Supabase:
 - 📄 **[scripts/ping.js](file:///c:/PROYECTS/MantenedorSupabase/scripts/ping.js)**: Punto de entrada para la ejecución por línea de comandos (CLI) que incluye diagnóstico local y estado de la nube en GitHub.
 - 📄 **[public/index.html](file:///c:/PROYECTS/MantenedorSupabase/public/index.html)**: Interfaz web SPA con tarjetas de estado en la nube, tabla de ejecuciones de GitHub Actions y disparador remoto.
 - 📄 **[.github/workflows/supabase-keeper.yml](file:///c:/PROYECTS/MantenedorSupabase/.github/workflows/supabase-keeper.yml)**: Archivo YAML que indica a GitHub la programación del Cron diario.
+
+---
+
+## 8. Análisis Post-Mortem de Incidentes y Mejoras de Resiliencia
+
+### 📝 Resumen del Incidente: Notificaciones de Pausa a pesar de Ejecuciones Exitosas
+
+#### Contexto y Síntomas
+Varios proyectos configurados en el plan gratuito de Supabase comenzaron a recibir notificaciones por correo de la plataforma indicando que la instancia *no había registrado suficiente actividad en los últimos 7 días y estaba programada para pausarse automáticamente*, a pesar de que el mantenedor ejecutaba tareas de comprobación de forma regular y reportaba estado exitoso.
+
+#### Análisis de Causa Raíz (RCA)
+Tras auditar el tráfico HTTP y las respuestas del API Gateway de Supabase, se identificaron los siguientes factores técnicos:
+
+1. **Bloqueo Perimetral en la Raíz OpenAPI (`/rest/v1/`):**
+   - La configuración por defecto enviaba las solicitudes a la raíz `https://<ref>.supabase.co/rest/v1/`.
+   - PostgREST y Kong restringen la inspección completa de la raíz OpenAPI a la clave de servicio (`service_role`). Al utilizar la clave pública `anon`, la pasarela responde de inmediato con `HTTP 401 Unauthorized` (`Only the service_role API key can be used for this endpoint`).
+   - Dado que el API Gateway rechaza la petición en el perímetro, **la solicitud jamás interactúa con el motor PostgreSQL**.
+2. **Falsos Positivos en la Evaluación de Estado:**
+   - La condición de éxito en el código evaluaba cualquier respuesta con código menor a 500 (`status < 500`) como señal de que el servicio estaba "vivo". Esto enmascaraba el error 401 como un estado verde en el panel de control.
+3. **Métrica Estricta de Telemetría de Supabase:**
+   - El daemon de inactividad de Supabase no evalúa el volumen de tráfico en la pasarela HTTP, sino las **consultas SQL reales ejecutadas contra el motor PostgreSQL**. Como ninguna consulta SQL se procesaba, el temporizador de inactividad continuaba avanzando hasta alcanzar los 7 días.
+
+---
+
+### 🛡️ Acciones Correctivas y Mejoras de Resiliencia Implementadas
+
+1. **Priorización de Consultas a Tablas (`target: "table"`):**
+   - El método estándar ahora realiza peticiones a tablas reales: `GET /rest/v1/<tabla>?select=*&limit=1`.
+   - Esta petición fuerza a PostgREST a ejecutar un `SELECT ... LIMIT 1` dentro de PostgreSQL, registrando una transacción de lectura legítima en las métricas de la base de datos y reseteando el contador de inactividad de inmediato.
+2. **Soporte de Catálogo de Almacenamiento (`target: "storage"`):**
+   - Para proyectos con políticas restrictivas de RLS en todas sus tablas públicas, se incorporó la estrategia de Storage (`GET /storage/v1/bucket`), que consulta la base de datos relacional interna del subsistema de almacenamiento con respuesta HTTP 200.
+3. **Mecanismo de Auto-Descubrimiento y Recuperación en Caliente:**
+   - En el archivo [`lib/keeper.js`](file:///c:/PROYECTS/MantenedorSupabase/lib/keeper.js), si una petición a la raíz devuelve un código 401, el motor activa un sondeo autónomo de tablas comunes conocidas y de Storage. Al hallar la primera ruta que responda 200 OK, redirige la consulta en caliente y registra el latido con éxito en PostgreSQL sin requerir intervención manual del usuario.
+4. **Validación Estricta sin Falsos Positivos:**
+   - Se eliminaron las clasificaciones laxas. Únicamente códigos de estado HTTP 2xx (200-299) marcan el ping como `SUCCESS`. Errores 401 o 404 son reportados como `FAILED`, acompañados de un mensaje orientativo para la configuración de la tabla.
+5. **Optimización de Interfaz en Dispositivos Móviles:**
+   - Se rediseñaron los componentes visuales para garantizar que en pantallas de 380px no se produzcan cortes de botones ni saltos a 2 líneas en badges ("Latido", "SSL", "API"), incorporando avisos claros sobre la navegación táctil y el desplazamiento horizontal de tablas y bloques de código.
+

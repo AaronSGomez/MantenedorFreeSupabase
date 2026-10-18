@@ -22,9 +22,10 @@ Un proyecto simple, completo y automático diseñado para realizar peticiones pe
 - **Automatización 100% Gratuita (GitHub Actions)**: Flujo de trabajo `.github/workflows/supabase-keeper.yml` para ejecutarse automáticamente **todos los días en la nube sin necesidad de mantener encendida tu PC**.
 - **Diagnóstico por Consola (CLI)**: Ejecuta `npm run ping` para obtener un informe instantáneo del estado de tus proyectos locales y de la nube.
 - **Múltiples Estrategias de Ping**:
-  - `REST API Root` (`https://<proyecto>.supabase.co/rest/v1/`): Ligero y seguro (Recomendado).
-  - `Auth Health` (`https://<proyecto>.supabase.co/auth/v1/health`): Comprobación del servicio de autenticación.
-  - `Consulta a Tabla`: Petición a una tabla específica (ej. `users`, `profiles`, `productos`).
+  - `Consulta a Tabla (Recomendada y 100% Efectiva)`: Ejecuta una lectura ligera (`SELECT ... LIMIT 1`) que interactúa directamente con el motor de PostgreSQL y resetea el contador de inactividad de 7 días.
+  - `Storage Buckets` (`https://<proyecto>.supabase.co/storage/v1/bucket`): Consulta la API de almacenamiento para proyectos que utilicen buckets.
+  - `Auth Health` (`https://<proyecto>.supabase.co/auth/v1/health`): Comprobación del microservicio de autenticación GoTrue.
+  - `Auto-Recuperación Inteligente`: Si un proyecto no tiene tabla definida o recibe un 401 en la raíz, el motor sondea automáticamente tablas públicas comunes hasta forzar una consulta exitosa en Postgres.
 
 ---
 
@@ -66,16 +67,21 @@ Para que GitHub sepa qué proyectos de Supabase debe mantener vivos sin publicar
     "name": "Mi Proyecto Produccion",
     "url": "https://xyzxyz.supabase.co",
     "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
-    "target": "rest"
+    "target": "table",
+    "customTable": "nombre_tabla"
   },
   {
     "name": "Mi Proyecto Desarrollo",
     "url": "https://abcabc.supabase.co",
     "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
-    "target": "auth"
+    "target": "table",
+    "customTable": "photos"
   }
 ]
 ```
+
+> ⚠️ **REGLA FUNDAMENTAL DE SUPABASE:**  
+> Supabase mide únicamente la actividad real que ejecuta consultas en el motor de **PostgreSQL**. Peticiones a la raíz (`/rest/v1/`) con claves `anon` son bloqueadas en el API Gateway (Kong) con HTTP 401 y no tocan la base de datos. Por ello, **configura siempre `"target": "table"` indicando el nombre de una tabla existente en `"customTable"`**.
 
 6. Haz clic en **Add secret**.
 
@@ -160,6 +166,23 @@ MantenedorSupabase/
 ├── package.json                  # Dependencias y scripts
 └── server.js                     # Servidor Express y endpoints API REST
 ```
+
+---
+
+## 🛠️ Registro de Incidentes y Mejoras de Resiliencia
+
+### ⚠️ Incidente: Notificaciones de Pausa por Inactividad tras Pings en Raíz (`/rest/v1/`)
+- **Síntoma:** Proyectos en plan gratuito recibieron avisos de pausa inminente por inactividad de 7 días a pesar de que el mantenedor reportaba ejecuciones diarias exitosas.
+- **Causa Raíz:**
+  1. Al configurar proyectos sin especificar una tabla concreta, las peticiones se enviaban a la raíz de la API PostgREST (`https://<ref>.supabase.co/rest/v1/`).
+  2. Supabase bloquea por seguridad el acceso a la raíz OpenAPI con claves públicas `anon`, devolviendo `HTTP 401 Unauthorized: Only service_role API key can be used for this endpoint`.
+  3. Este bloqueo es ejecutado en el API Gateway perimetral (Kong) **antes de que la petición llegue a PostgreSQL**.
+  4. Debido a que el software consideraba respuestas HTTP `< 500` como proyectos "despiertos", se generaba un **falso positivo** en los logs mientras la base de datos PostgreSQL permanecía sin ninguna consulta real.
+- **Resolución y Mejoras Implementadas:**
+  1. **Consultas Directas a Tablas (`target: "table"`):** Se estableció como método oficial consultar una tabla existente mediante `GET /rest/v1/<tabla>?select=*&limit=1`, garantizando que PostgreSQL procese una consulta SQL legítima y reinicie la telemetría de inactividad.
+  2. **Auto-Recuperación y Auto-Descubrimiento en Caliente:** El motor de ejecución ([`lib/keeper.js`](file:///c:/PROYECTS/MantenedorSupabase/lib/keeper.js)) ahora detecta automáticamente si una petición en raíz es rechazada con 401 y sondea de inmediato tablas públicas comunes o endpoints de Storage (`/storage/v1/bucket`) hasta obtener un HTTP 200 OK en Postgres de manera autónoma.
+  3. **Validación Estricta de Códigos HTTP:** Se eliminaron los falsos positivos. Únicamente respuestas HTTP 2xx (200-299) son catalogadas como `SUCCESS`. Códigos 401 o 404 se reportan inmediatamente como `FAILED` con alertas descriptivas.
+  4. **Optimización Visual en Dispositivos Móviles:** Se optimizó la interfaz para pantallas de 380px de ancho, incluyendo etiquetas compactas responsivas ("Latido", "SSL", "API"), prevención de saltos a 2 líneas y barras táctiles de scroll horizontal.
 
 ---
 
