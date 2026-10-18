@@ -226,7 +226,8 @@ app.post('/api/projects/:id/ping', async (req, res) => {
 
 // Trigger Ping for ALL Active Projects
 app.all(['/api/ping-all', '/api/cron'], async (req, res) => {
-  if (CRON_SECRET) {
+  // Exigir CRON_SECRET exclusivamente si se invoca la ruta dedicada de cron /api/cron
+  if (req.path === '/api/cron' && CRON_SECRET) {
     const headerSecret = req.headers['x-cron-secret'] || req.headers['authorization'];
     const querySecret = req.query.secret;
     const providedSecret = headerSecret ? headerSecret.replace('Bearer ', '') : querySecret;

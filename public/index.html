@@ -413,7 +413,11 @@
         if (res.ok && data.result) {
           saveStoredPing(id, data.result.projectName, data.result);
           renderShowcaseComponent();
-          showToast(`¡Latido exitoso! (${data.result.latencyMs} ms · HTTP ${data.result.httpStatus})`, 'success');
+          if (data.result.status === 'SUCCESS' && data.result.httpStatus >= 200 && data.result.httpStatus < 300) {
+            showToast(`¡Latido exitoso! (${data.result.latencyMs} ms · HTTP ${data.result.httpStatus})`, 'success');
+          } else {
+            showToast(`Alerta: HTTP ${data.result.httpStatus} (${data.result.message || 'Respuesta no exitosa'})`, 'error');
+          }
         } else {
           showToast(data.error || 'Error al enviar latido', 'error');
         }
