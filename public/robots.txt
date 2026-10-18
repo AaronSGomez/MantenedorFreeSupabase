@@ -1,0 +1,8 @@
+# Robots.txt para Supalive
+# Autor: Aarón Santiago Gómez Abella (https://aaronsgomez.es)
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://aaronsgomez.es/sitemap.xml

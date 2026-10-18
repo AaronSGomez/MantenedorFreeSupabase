@@ -14,9 +14,17 @@
     "keep-alive",
     "ping",
     "cron",
-    "github-actions"
+    "github-actions",
+    "postgresql",
+    "database-keepalive",
+    "vercel"
   ],
-  "author": "",
+  "author": "Aarón Santiago Gómez Abella <https://aaronsgomez.es>",
+  "homepage": "https://aaronsgomez.es",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AaronSGomez/MantenedorFreeSupabase.git"
+  },
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
